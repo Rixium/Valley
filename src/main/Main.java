@@ -1,4 +1,5 @@
 package main;
+
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
@@ -6,26 +7,24 @@ import javax.swing.JFrame;
 import util.InputListener;
 import util.ResourceLoader;
 
-
-
 public class Main {
 
 	public final static String title = "Valley"; // Game Title.
-	
+
 	public static final int SCALE = 2;
 	public final static int GAME_WIDTH = 640 * SCALE; // Default Width.
 	public static final int GAME_HEIGHT = 360 * SCALE; // Default Height.
-	
+
 	public static ResourceLoader resourceLoader = new ResourceLoader();
 	public static JFrame frame = new JFrame();
 	public static Game game = new Game(frame, GAME_WIDTH, GAME_HEIGHT);
-	
+
 	private static InputListener inputListener;
-	
+
 	public static void main(String[] args) {
-		
+
 		inputListener = new InputListener();
-		
+
 		frame.add(game);
 		frame.setTitle(title); // Set the title of JFrame.
 		frame.setFocusable(true);

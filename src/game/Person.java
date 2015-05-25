@@ -1,6 +1,5 @@
 package game;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -12,7 +11,9 @@ import javax.swing.Timer;
 
 import main.Main;
 import math.Vector2;
-import entity.Lake;
+import Person.Inventory;
+import entity.Rock;
+import entity.Stockpile;
 import entity.Tree;
 
 public class Person extends Entity {
@@ -58,26 +59,49 @@ public class Person extends Entity {
 	private double fireDistance;
 
 	private Tree tree;
+	private Rock rock;
+
 	private boolean hasTree;
+	private boolean hasRock;
+
 	private boolean gettingStamina;
 
 	private Tile destinationTile;
 	private Tile currentTile;
-	
+
 	private boolean isWatering = false;
 	private boolean isMining = false;
-	
+
+	private Inventory inventory;
+
+	private boolean carrying = false;
+
 	private Timer waterTimer = new Timer(3000, new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			hasTree = false;
 			isWatering = false;
 			destinationPos = firePos;
 			tree.water();
-			
+			inventory.addWood(2);
+			carrying = true;
 			tree = null;
-			((Timer)e.getSource()).stop();
+			((Timer) e.getSource()).stop();
+		}
+	});
+
+	private Timer miningTimer = new Timer(3000, new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setHasRock(false);
+			setMining(false);
+			destinationPos = firePos;
+			rock.mine();
+			inventory.addRock(2);
+			carrying = true;
+			rock = null;
+			((Timer) e.getSource()).stop();
 		}
 	});
 
@@ -85,6 +109,8 @@ public class Person extends Entity {
 		godName = god.getName();
 		this.entityName = "Person";
 		this.name = setName();
+
+		this.inventory = new Inventory();
 
 		int randomHead = random.nextInt(Main.resourceLoader.heads.length);
 		this.head = Main.resourceLoader.heads[randomHead];
@@ -141,8 +167,8 @@ public class Person extends Entity {
 
 		this.map = map;
 
-		if (!hasDestination && stamina > 5) {
-			if (!hasTree) {
+		if (!hasDestination && stamina > 5 && !carrying) {
+			if (!hasTree && !hasRock) {
 
 				int getDestination = random.nextInt(500);
 				if (getDestination == 1) {
@@ -176,6 +202,10 @@ public class Person extends Entity {
 				+ (firePos.y - pos.y) * (firePos.y - pos.y));
 
 		if (fireDistance <= 10 && stamina < 100 && gettingStamina) {
+			carrying = false;
+
+			clearInventory();
+
 			int addStamina = random.nextInt(10);
 			if (addStamina == 1) {
 				stamina += 1;
@@ -195,8 +225,10 @@ public class Person extends Entity {
 			}
 		}
 
-		if (stamina <= 5) {
+		if (stamina <= 5 || carrying) {
 			hasTree = false;
+			hasRock = false;
+			rock = null;
 			tree = null;
 			destinationPos = firePos;
 			gettingStamina = true;
@@ -268,8 +300,15 @@ public class Person extends Entity {
 			if (hasTree) {
 				if (length <= 10 && length >= -10) {
 					isWatering = true;
-					
+
 					waterTimer.start();
+				}
+			}
+			if (hasRock) {
+				if (length <= 10 && length >= -10) {
+					isMining = true;
+
+					miningTimer.start();
 				}
 			}
 		}
@@ -299,9 +338,15 @@ public class Person extends Entity {
 					+ renderY + 5, null);
 			g.drawImage(head, pos.x + renderX, pos.y + renderY, null);
 		}
-		
-		if(isWatering) {
-			g.drawImage(Main.resourceLoader.wateringcan, pos.x + renderX + image.getWidth() - 6 , pos.y + renderY + image.getHeight() / 2 + 5, null);
+
+		if (isWatering) {
+			g.drawImage(Main.resourceLoader.wateringcan, pos.x + renderX
+					+ image.getWidth() - 6, pos.y + renderY + image.getHeight()
+					/ 2 + 5, null);
+		} else if (isMining) {
+			g.drawImage(Main.resourceLoader.pickaxe,
+					pos.x + renderX + image.getWidth() - 6, pos.y + renderY
+							+ image.getHeight() / 2 + 5, null);
 		}
 	}
 
@@ -511,6 +556,7 @@ public class Person extends Entity {
 	public void giveTree(Tree tree) {
 		if (!hasTree && !gettingStamina) {
 			hasDestination = true;
+			atDestination = false;
 			hasTree = true;
 			this.destinationPos = tree.getPos();
 			this.tree = tree;
@@ -525,4 +571,45 @@ public class Person extends Entity {
 	public boolean isGettingStamina() {
 		return this.gettingStamina;
 	}
+
+	public boolean isMining() {
+		return isMining;
+	}
+
+	public void setMining(boolean isMining) {
+		this.isMining = isMining;
+	}
+
+	public boolean getHasRock() {
+		return hasRock;
+	}
+
+	public void setHasRock(boolean hasRock) {
+		this.hasRock = hasRock;
+	}
+
+	public void giveRock(Rock rock) {
+		if (!hasRock && !gettingStamina) {
+			hasDestination = true;
+			atDestination = false;
+			hasRock = true;
+			this.destinationPos = new Vector2(rock.getPos().x, rock.getPos().y);
+			this.rock = rock;
+		}
+	}
+	
+	public void clearInventory() {
+		Stockpile stockpile = map.getStockpile();
+		if(inventory.getWoodCount() > 0) {
+			System.out.println("Adding " + inventory.getWoodCount() + " Wood to the Stockpile.");
+			stockpile.addWood(inventory.getWoodCount());
+			inventory.removeWood();
+		}
+		if(inventory.getRockCount() > 0) {
+			System.out.println("Adding " + inventory.getRockCount() + " Rock to the Stockpile.");
+			stockpile.addRock(inventory.getRockCount());
+			inventory.removeRock();
+		}
+	}
+
 }

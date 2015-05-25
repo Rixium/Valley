@@ -61,6 +61,7 @@ public class ResourceLoader {
 	public BufferedImage tree;
 	public BufferedImage sapling;
 	public BufferedImage rock;
+	public BufferedImage rockMined;
 	
 	public BufferedImage cow;
 
@@ -106,6 +107,7 @@ public class ResourceLoader {
 	
 	// Role objects
 	public BufferedImage wateringcan;
+	public BufferedImage pickaxe;
 
 	public ResourceLoader() {
 		splashImage = getBufferedImage("res/splash.png");
@@ -191,8 +193,10 @@ public class ResourceLoader {
 		loadImage = getBufferedImage("res/loadImage.png");
 		
 		wateringcan = getBufferedImage("res/skillobjects/wateringcan.png");
+		pickaxe = getBufferedImage("res/skillobjects/pickaxe.png");
 		
 		rock = getBufferedImage("res/gameobjects/rock.png");
+		rockMined = getBufferedImage("res/gameobjects/rockMined.png");
 	}
 
 	public Clip loadClip(String filename) {

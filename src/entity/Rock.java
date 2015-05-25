@@ -10,7 +10,11 @@ import math.Vector2;
 
 public class Rock extends Entity {
 
+	private boolean dead = false;
+	private boolean hasPerson = false;
+
 	public Rock(Vector2 pos) {
+		this.entityName = "Rock";
 		this.image = Main.resourceLoader.rock;
 		this.pos = pos;
 		this.rect = new Rectangle(pos.x, pos.y, image.getWidth(),
@@ -22,7 +26,23 @@ public class Rock extends Entity {
 	}
 
 	public void paint(Graphics2D g) {
-		g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
+		if (!dead) {
+			g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
+		} else {
+			g.drawImage(Main.resourceLoader.rockMined, pos.x + renderX, pos.y + renderY,  null);
+		}
+	}
+
+	public void mine() {
+		dead = true;
+	}
+	
+	public boolean getHasPerson() {
+		return this.hasPerson;
+	}
+	
+	public boolean getDead() {
+		return this.dead;
 	}
 
 }

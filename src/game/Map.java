@@ -15,6 +15,7 @@ import screen.GameScreen;
 import entity.Cow;
 import entity.Lake;
 import entity.Rock;
+import entity.Stockpile;
 import entity.Tree;
 
 public class Map {
@@ -48,11 +49,16 @@ public class Map {
 	private Lake lake;
 	private int selectedTileRole = TileRoles.EMPTY;
 
+	private Rock rock;
+	private boolean gotRock;
+
 	private boolean canClick;
 
 	private boolean showRole;
 
 	private boolean isReady = false;
+
+	private Stockpile stockpile;
 
 	public Map(String size, String treeGrowth, God god) {
 		population = 0;
@@ -76,6 +82,7 @@ public class Map {
 		}
 
 		hasFire = false;
+		stockpile = new Stockpile();
 		createMap();
 	}
 
@@ -133,11 +140,11 @@ public class Map {
 	}
 
 	public void addRocks() {
-		for(int i = 0; i < tiles.length; i++) {
-			for(int j = 0; j < tiles[i].length; j++) {
+		for (int i = 0; i < tiles.length; i++) {
+			for (int j = 0; j < tiles[i].length; j++) {
 				int ranNum = random.nextInt(100);
-				if(ranNum == 1) {
-					if(!tiles[i][j].isOccupied()) {
+				if (ranNum == 1) {
+					if (!tiles[i][j].isOccupied()) {
 						Rock rock = new Rock(tiles[i][j].getPos());
 						entities.add(rock);
 					}
@@ -146,7 +153,7 @@ public class Map {
 		}
 		isReady = true;
 	}
-	
+
 	public void update(int renderX, int renderY, God god) {
 		if (isReady) {
 			this.god = god;
@@ -166,14 +173,17 @@ public class Map {
 						} else {
 							tiles[i][j].showRole(false);
 						}
-						if(tiles[i][j].getTileRole() == TileRoles.FARM) {
+						if (tiles[i][j].getTileRole() == TileRoles.FARM) {
 							int spawnCow = random.nextInt(5000);
-							if(spawnCow == 1) {
+							if (spawnCow == 1) {
 								int tileXOffset = random.nextInt(100);
 								int tileYOffset = random.nextInt(100);
 								tileXOffset -= 50;
 								tileYOffset -= 50;
-								Cow cow = new Cow(new Vector2(tiles[i][j].getPos().x + tileXOffset, tiles[i][j].getPos().y + tileYOffset), this);
+								Cow cow = new Cow(new Vector2(
+										tiles[i][j].getPos().x + tileXOffset,
+										tiles[i][j].getPos().y + tileYOffset),
+										this);
 								entities.add(cow);
 							}
 						}
@@ -190,7 +200,6 @@ public class Map {
 			}
 
 			for (int i = 0; i < entities.size(); i++) {
-
 				Entity entity = entities.get(i);
 				if (entity != null) {
 					if (entity.getPos().x < Main.GAME_WIDTH + -renderX
@@ -237,10 +246,24 @@ public class Map {
 									}
 								}
 							}
+						} else if (person.getRole() == Role.miner) {
+							if (person.getStamina() > 5 && !person.isMining()
+									&& !person.getHasRock() && gotRock
+									&& !rock.getHasPerson()) {
+								person.giveRock(rock);
+								rock = null;
+								gotRock = false;
+							}
 						}
 					} else if (entity.getEntityName() == "Fire") {
 						fire = (Item) entities.get(i);
 						hasFire = true;
+					} else if (entity.getEntityName() == "Rock") {
+						Rock tempRock = (Rock) entity;
+						if (!tempRock.getDead()) {
+							rock = (Rock) entity;
+							gotRock = true;
+						}
 					}
 				}
 
@@ -346,8 +369,8 @@ public class Map {
 							int randomVoice = random
 									.nextInt(Main.resourceLoader.voices.length);
 							Main.resourceLoader.playClip(
-									Main.resourceLoader.voices[randomVoice], -5f,
-									false);
+									Main.resourceLoader.voices[randomVoice],
+									-5f, false);
 						}
 					}
 				}
@@ -423,5 +446,9 @@ public class Map {
 
 	public boolean getIsReady() {
 		return this.isReady;
+	}
+
+	public Stockpile getStockpile() {
+		return this.stockpile;
 	}
 }
