@@ -116,6 +116,11 @@ public class Tree extends Entity {
 		this.hasPerson = false;
 		this.thirst = 0;
 		this.age += 1;
+		
+		if(age >= 10) {
+			setSapling(false);
+			setHasPerson(false);
+		}
 	}
 	
 	public boolean hasPerson() {

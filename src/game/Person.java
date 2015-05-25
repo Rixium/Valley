@@ -64,7 +64,22 @@ public class Person extends Entity {
 	private Tile destinationTile;
 	private Tile currentTile;
 	
-	private boolean watering = true;
+	private boolean isWatering = false;
+	private boolean isMining = false;
+	
+	private Timer waterTimer = new Timer(3000, new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			hasTree = false;
+			isWatering = false;
+			destinationPos = firePos;
+			tree.water();
+			
+			tree = null;
+			((Timer)e.getSource()).stop();
+		}
+	});
 
 	public Person(Item fire, Map map, God god) {
 		godName = god.getName();
@@ -252,25 +267,9 @@ public class Person extends Entity {
 		if (!gettingStamina) {
 			if (hasTree) {
 				if (length <= 10 && length >= -10) {
-					hasTree = false;
-					tree.water();
-					watering = true;
-					Timer waterTimer = new Timer(10, new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							watering = false;
-							destinationPos = firePos;
-							
-
-							if (tree.getAge() >= 10) {
-								tree.setSapling(false);
-								tree.setHasPerson(false);
-							}
-							
-							tree = null;
-						}
-					});
+					isWatering = true;
 					
+					waterTimer.start();
 				}
 			}
 		}
@@ -301,8 +300,8 @@ public class Person extends Entity {
 			g.drawImage(head, pos.x + renderX, pos.y + renderY, null);
 		}
 		
-		if(watering) {
-			g.drawImage(Main.resourceLoader.wateringcan, pos.x + renderX + image.getWidth() , pos.y + renderY + image.getHeight() / 2, null);
+		if(isWatering) {
+			g.drawImage(Main.resourceLoader.wateringcan, pos.x + renderX + image.getWidth() - 6 , pos.y + renderY + image.getHeight() / 2 + 5, null);
 		}
 	}
 
