@@ -411,7 +411,7 @@ public class Person extends Entity {
 	}
 
 	public String setName() {
-		int num = random.nextInt(22);
+		int num = random.nextInt(23);
 		String name;
 
 		switch (num) {
@@ -477,6 +477,9 @@ public class Person extends Entity {
 			break;
 		case 21:
 			name = "Kieran";
+			break;
+		case 22:
+			name = "Hugo";
 			break;
 		default:
 			name = "Steven";
