@@ -385,7 +385,7 @@ public class Map implements Serializable {
 		if (entities.size() > 0) {
 			for (int i = 0; i < entities.size(); i++) {
 				if (mousePos.intersects(entities.get(i).getRect())) {
-					if (entities.get(i).entityName == "Person") {
+					if (entities.get(i).entityName.matches("Person")) {
 						if (selectedPerson != null) {
 							Person currentPerson = (Person) entities.get(i);
 							if (selectedPerson != null
