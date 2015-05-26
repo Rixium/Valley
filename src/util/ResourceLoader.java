@@ -64,7 +64,9 @@ public class ResourceLoader {
 	public BufferedImage rockMined;
 
 	public BufferedImage cow;
-
+	
+	public BufferedImage cycle;
+	
 	public boolean menuMusicPlaying;
 
 	// Game Items
@@ -199,6 +201,8 @@ public class ResourceLoader {
 		rock = getBufferedImage("res/gameobjects/rock.png");
 		rockMined = getBufferedImage("res/gameobjects/rockMined.png");
 		stockpile = getBufferedImage("res/gameobjects/stockpile.png");
+
+		cycle = getBufferedImage("res/night.png");
 	}
 
 	public Clip loadClip(String filename) {

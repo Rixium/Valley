@@ -10,8 +10,6 @@ import item.Fire;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -19,6 +17,7 @@ import java.awt.event.MouseEvent;
 
 import main.Main;
 import math.Vector2;
+import mechanics.Cycle;
 import object.Button;
 
 public class GameScreen extends Screen {
@@ -47,6 +46,7 @@ public class GameScreen extends Screen {
 	private boolean paused;
 
 	private God god;
+	private Cycle cycle;
 
 	private int selectedTileRole = TileRoles.EMPTY;
 
@@ -56,6 +56,7 @@ public class GameScreen extends Screen {
 		}
 
 		god = new God(godname);
+		cycle = new Cycle();
 		faith = 0;
 		scrollSpeed = 5;
 		quitButton = new Button(Main.resourceLoader.quit,
@@ -130,6 +131,7 @@ public class GameScreen extends Screen {
 	public void paint(Graphics2D g) {
 		if (map.getIsReady()) {
 			map.paint(g);
+			cycle.paint(g);
 			ui.paint(g);
 
 			if (selectedItem != null) {

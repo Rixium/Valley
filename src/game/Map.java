@@ -11,6 +11,7 @@ import java.util.Random;
 
 import main.Main;
 import math.Vector2;
+import mechanics.Cycle;
 import screen.GameScreen;
 import entity.Cow;
 import entity.Lake;
@@ -336,6 +337,7 @@ public class Map {
 				}
 			}
 		}
+		
 	}
 
 	public void keyPressed(KeyEvent e) {
