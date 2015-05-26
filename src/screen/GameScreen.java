@@ -112,7 +112,7 @@ public class GameScreen extends Screen {
 							+ Main.GAME_WIDTH;
 				}
 
-				map.update(renderX, renderY, god);
+				map.update(renderX, renderY, god, cycle);
 
 				if (map.getSelectedPerson() != null) {
 					ui.showPersonStats(true, map.getSelectedPerson());

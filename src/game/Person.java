@@ -11,6 +11,7 @@ import javax.swing.Timer;
 
 import main.Main;
 import math.Vector2;
+import mechanics.Cycle;
 import Person.Inventory;
 import entity.Rock;
 import entity.Stockpile;
@@ -77,6 +78,8 @@ public class Person extends Entity {
 	private boolean carrying = false;
 	private boolean carryingStockpile;
 
+	private boolean atFire;
+
 	private Timer waterTimer = new Timer(3000, new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -108,11 +111,13 @@ public class Person extends Entity {
 		}
 	});
 
-	public Person(Item fire, Map map, God god, boolean carryingStockpile) {
+	public Person(Item fire, Map map, God god, boolean carryingStockpile,
+			Cycle cycle) {
 		godName = god.getName();
 		this.entityName = "Person";
 		this.name = setName();
 		this.carryingStockpile = carryingStockpile;
+		this.cycle = cycle;
 
 		this.inventory = new Inventory();
 
@@ -167,41 +172,44 @@ public class Person extends Entity {
 		this.setLive(true);
 	}
 
-	public void update(int renderX, int renderY, Map map) {
+	public void update(int renderX, int renderY, Map map, Cycle cycle) {
 
 		this.map = map;
 
-		if (!hasDestination && stamina > 5 && !carryingStockpile && !carrying) {
-			if (!hasTree && !hasRock) {
+		if (this.cycle.getDay()) {
+			if (!hasDestination && stamina > 5 && !carryingStockpile
+					&& !carrying) {
+				if (!hasTree && !hasRock) {
 
-				int getDestination = random.nextInt(500);
-				if (getDestination == 1) {
-					int destinationX = random.nextInt(200);
-					int destinationY = random.nextInt(200);
-					destinationX -= 100;
-					destinationY -= 100;
+					int getDestination = random.nextInt(500);
+					if (getDestination == 1) {
+						int destinationX = random.nextInt(200);
+						int destinationY = random.nextInt(200);
+						destinationX -= 100;
+						destinationY -= 100;
 
-					if (pos.x + destinationX > 0) {
-						if (pos.x + destinationX < map.getSize()
-								* map.getTileSize()) {
-							if (pos.y + destinationY > 0) {
-								if (pos.y + destinationY < map.getSize()
-										* map.getTileSize()) {
-									destinationPos.x = pos.x + destinationX;
-									destinationPos.y = pos.y + destinationY;
+						if (pos.x + destinationX > 0) {
+							if (pos.x + destinationX < map.getSize()
+									* map.getTileSize()) {
+								if (pos.y + destinationY > 0) {
+									if (pos.y + destinationY < map.getSize()
+											* map.getTileSize()) {
+										destinationPos.x = pos.x + destinationX;
+										destinationPos.y = pos.y + destinationY;
 
-									hasDestination = true;
+										hasDestination = true;
+									}
 								}
 							}
 						}
 					}
 				}
+			} else if (carrying) {
+				destinationPos = new Vector2(map.getStockpile().getPos().x, map
+						.getStockpile().getPos().y);
+				hasDestination = true;
+				atDestination = false;
 			}
-		} else if (carrying) {
-			destinationPos = new Vector2(map.getStockpile().getPos().x, map
-					.getStockpile().getPos().y);
-			hasDestination = true;
-			atDestination = false;
 		}
 
 		this.renderX = renderX;
@@ -210,6 +218,13 @@ public class Person extends Entity {
 		fireDistance = Math.sqrt((firePos.x - pos.x) * (firePos.x - pos.x)
 				+ (firePos.y - pos.y) * (firePos.y - pos.y));
 
+		if (fireDistance <= 10) {
+			if (stamina < 100) {
+				stamina++;
+			}
+			atFire = true;
+		}
+
 		if (fireDistance <= 10 && stamina < 100 && gettingStamina) {
 
 			if (carryingStockpile) {
@@ -217,9 +232,11 @@ public class Person extends Entity {
 				carryingStockpile = false;
 			}
 
-			int addStamina = random.nextInt(10);
-			if (addStamina == 1) {
-				stamina += 1;
+			if (stamina < 100) {
+				int addStamina = random.nextInt(10);
+				if (addStamina == 1) {
+					stamina += 1;
+				}
 			}
 		} else if (stamina > 0) {
 			int loseStamina = random.nextInt(100);
@@ -244,27 +261,30 @@ public class Person extends Entity {
 			}
 		}
 
-		if (stamina <= 5) {
+		if (stamina <= 5 && !atFire || !cycle.getDay() && !atFire) {
+			this.waterTimer.stop();
+			this.miningTimer.stop();
+			this.isMining = false;
+			this.isWatering = false;
 			hasTree = false;
 			hasRock = false;
 			rock = null;
 			tree = null;
-			destinationPos = firePos;
 			gettingStamina = true;
 			if (!hasDestination) {
+				destinationPos = firePos;
 				if (!carryingStockpile) {
 					int distanceFireX = random.nextInt(100);
 					distanceFireX -= 50;
-					destinationPos.x += distanceFireX;
 
 					int distanceFireY = random.nextInt(100);
 					distanceFireY -= 50;
+					destinationPos.x += distanceFireX;
 					destinationPos.y += distanceFireY;
-					hasDestination = true;
 				} else {
 					destinationPos.x += 40;
-					hasDestination = true;
 				}
+				hasDestination = true;
 			}
 		}
 
@@ -362,7 +382,7 @@ public class Person extends Entity {
 
 		}
 
-		super.update(renderX, renderY, map);
+		super.update(renderX, renderY, map, cycle);
 
 	}
 

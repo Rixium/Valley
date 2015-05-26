@@ -75,7 +75,7 @@ public class Cycle {
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 	}
 
-	public boolean getTime() {
+	public boolean getDay() {
 		return isDay;
 	}
 }

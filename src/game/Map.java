@@ -12,6 +12,7 @@ import java.util.Random;
 import main.Main;
 import math.Vector2;
 import mechanics.Cycle;
+import mechanics.LightSource;
 import screen.GameScreen;
 import entity.Cow;
 import entity.Lake;
@@ -40,6 +41,7 @@ public class Map {
 	private boolean hasFire;
 
 	private God god;
+	private Cycle cycle;
 
 	private Item fire;
 
@@ -63,6 +65,8 @@ public class Map {
 	private boolean hasStockpile = false;
 
 	private boolean giveStockpile = true;
+	
+	private ArrayList<LightSource> lightSources = new ArrayList<LightSource>();
 
 	public Map(String size, String treeGrowth, God god) {
 		population = 0;
@@ -157,8 +161,9 @@ public class Map {
 		isReady = true;
 	}
 
-	public void update(int renderX, int renderY, God god) {
+	public void update(int renderX, int renderY, God god, Cycle cycle) {
 		if (isReady) {
+			this.cycle = cycle;
 			this.god = god;
 			this.renderX = renderX;
 			this.renderY = renderY;
@@ -213,9 +218,9 @@ public class Map {
 									- entity.image.getWidth()
 							&& entity.getPos().y > -renderY - tileSize
 									- entity.image.getHeight()) {
-						entity.update(renderX, renderY, this);
+						entity.update(renderX, renderY, this, cycle);
 					} else if (entity.getEntityName() == "Person") {
-						entity.update(renderX, renderY, this);
+						entity.update(renderX, renderY, this, cycle);
 					}
 
 					if (entity.getEntityName() == "Tree" && thirstyTree == null) {
@@ -237,14 +242,16 @@ public class Map {
 								if (person.getStamina() > 5
 										&& !person.isGettingStamina()) {
 									if (!person.hasTree()) {
-										if (thirstyTree.getIsSapling()) {
-											if (!thirstyTree.hasPerson()) {
-												thirstyTree.setHasPerson(true);
-												person.giveTree(thirstyTree);
+										if(cycle.getDay()) {
+											if (thirstyTree.getIsSapling()) {
+												if (!thirstyTree.hasPerson()) {
+													thirstyTree.setHasPerson(true);
+													person.giveTree(thirstyTree);
+													thirstyTree = null;
+												}
+											} else {
 												thirstyTree = null;
 											}
-										} else {
-											thirstyTree = null;
 										}
 									}
 								}
@@ -254,12 +261,14 @@ public class Map {
 									&& !person.isGettingStamina()) {
 								if (!person.getHasRock()
 										&& !person.isCarrying()) {
-									if (gotRock) {
-										person.giveRock(rock);
-										rock.setHasPerson(true);
-										rock = null;
-										gotRock = false;
-										System.out.println("Giving Rock");
+									if(cycle.getDay()) {
+										if (gotRock) {
+											person.giveRock(rock);
+											rock.setHasPerson(true);
+											rock = null;
+											gotRock = false;
+											System.out.println("Giving Rock");
+										}
 									}
 								}
 							}
@@ -294,7 +303,7 @@ public class Map {
 
 							population++;
 							Person person = new Person(fire, this, god,
-									giveStockpile);
+									giveStockpile, cycle);
 							giveStockpile = false;
 							entities.add(person);
 						}
@@ -337,7 +346,7 @@ public class Map {
 				}
 			}
 		}
-		
+
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -402,7 +411,7 @@ public class Map {
 			}
 		}
 
-		if (stockpile != null) {
+		if (hasStockpile) {
 			if (mousePos.intersects(stockpile.getRect())) {
 				System.out.println("WoodCount: " + stockpile.getWood());
 				System.out.println("RockCount: " + stockpile.getRock());
@@ -480,5 +489,9 @@ public class Map {
 		this.stockpile = new Stockpile(new Vector2(pos.x, pos.y));
 		entities.add(stockpile);
 		hasStockpile = true;
+	}
+
+	public Cycle getCycle() {
+		return this.cycle;
 	}
 }

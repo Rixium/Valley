@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 
 import main.Main;
 import math.Vector2;
+import mechanics.Cycle;
 
 public class Lake extends Entity {
 
@@ -19,7 +20,7 @@ public class Lake extends Entity {
 		this.rect = new Rectangle(pos.x, pos.y, image.getWidth(), image.getHeight());
 	}
 	
-	public void update(int renderX, int renderY, Map map) {
+	public void update(int renderX, int renderY, Map map, Cycle cycle) {
 		this.renderX = renderX;
 		this.renderY = renderY;
 		this.rect.x = pos.x + renderX;

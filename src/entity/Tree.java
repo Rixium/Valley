@@ -11,6 +11,7 @@ import java.util.Random;
 
 import main.Main;
 import math.Vector2;
+import mechanics.Cycle;
 
 public class Tree extends Entity {
 
@@ -47,7 +48,7 @@ public class Tree extends Entity {
 		this.layer = (pos.y + 10) / map.getSize();
 	}
 
-	public void update(int renderX, int renderY, Map map) {
+	public void update(int renderX, int renderY, Map map, Cycle cycle) {
 		this.map = map;
 		this.renderX = renderX;
 		this.renderY = renderY;
