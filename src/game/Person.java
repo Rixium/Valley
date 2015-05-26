@@ -352,7 +352,6 @@ public class Person extends Entity implements Serializable {
 			if (hasRock) {
 				if (length <= 10 && length >= -10) {
 					isMining = true;
-
 					miningTimer.start();
 				}
 			}
@@ -697,6 +696,8 @@ public class Person extends Entity implements Serializable {
 		Person person = this;
 		person.waterTimer.stop();
 		person.miningTimer.stop();
+		person.waterTimer.restart();
+		person.miningTimer.restart();
 		person.isMining = false;
 		person.isWatering = false;
 		person.hasTree= false;
@@ -707,6 +708,38 @@ public class Person extends Entity implements Serializable {
 		person.hasDestination = false;
 		person.gettingStamina = false;
 		person.role = Role.normal;
+		
+		person.waterTimer = new Timer(3000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				hasTree = false;
+				isWatering = false;
+				destinationPos = firePos;
+				tree.water();
+				inventory.addWood(2);
+				carrying = true;
+				stamina -= 10;
+				tree = null;
+				((Timer) e.getSource()).stop();
+			}
+		});
+		
+		person.miningTimer = new Timer(3000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				rock.mine();
+				setHasRock(false);
+				setMining(false);
+				destinationPos = firePos;
+				inventory.addRock(2);
+				carrying = true;
+				stamina -= 10;
+				rock = null;
+				((Timer) e.getSource()).stop();
+			}
+		});
+		
 		return person;
     }
 
