@@ -61,7 +61,6 @@ public class Game extends JPanel implements Runnable {
 	public void blit() {
 		float current = System.currentTimeMillis();
 		Graphics2D g2d = (Graphics2D) image.createGraphics(); // Create graphics of g2d.
-		g2d.clearRect(0, 0, image.getWidth(), image.getHeight());
 		currentScreen.paint(g2d);
 		g2d.dispose();
 		durationMS = System.currentTimeMillis() - current;
@@ -69,6 +68,7 @@ public class Game extends JPanel implements Runnable {
 	
 	@Override
 	public void paintComponent(Graphics g) {
+		blit();
 		super.paintComponent(g);
 		g.drawImage(image, 0, 0, null);
 		
@@ -91,11 +91,10 @@ public class Game extends JPanel implements Runnable {
 			while(delta >= 1) {
 				
 				update();
-				blit();
+				
 				updates++;
 				delta--;
 			}
-			
 			repaint();
 			frames++;
 			if(System.currentTimeMillis() - timer > 1000) {
@@ -106,7 +105,7 @@ public class Game extends JPanel implements Runnable {
 			}
 			
 			try {
-                Thread.sleep(Math.max(0, 17 - (int)durationMS));
+                Thread.sleep(1);
             } catch (InterruptedException e) {
             }
 			

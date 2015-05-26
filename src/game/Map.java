@@ -65,7 +65,8 @@ public class Map {
 	private boolean hasStockpile = false;
 
 	private boolean giveStockpile = true;
-	
+
+	private boolean setSourcesInactive = false;
 	private ArrayList<LightSource> lightSources = new ArrayList<LightSource>();
 
 	public Map(String size, String treeGrowth, God god) {
@@ -207,6 +208,15 @@ public class Map {
 				}
 			}
 
+			for (int i = 0; i < lightSources.size(); i++) {
+				lightSources.get(i).update(renderX, renderY);
+				if (cycle.getDay()) {
+					lightSources.get(i).setActive(false);
+				} else {
+					lightSources.get(i).setActive(true);
+				}
+			}
+
 			for (int i = 0; i < entities.size(); i++) {
 				Entity entity = entities.get(i);
 				if (entity != null) {
@@ -242,10 +252,11 @@ public class Map {
 								if (person.getStamina() > 5
 										&& !person.isGettingStamina()) {
 									if (!person.hasTree()) {
-										if(cycle.getDay()) {
+										if (cycle.getDay()) {
 											if (thirstyTree.getIsSapling()) {
 												if (!thirstyTree.hasPerson()) {
-													thirstyTree.setHasPerson(true);
+													thirstyTree
+															.setHasPerson(true);
 													person.giveTree(thirstyTree);
 													thirstyTree = null;
 												}
@@ -261,7 +272,7 @@ public class Map {
 									&& !person.isGettingStamina()) {
 								if (!person.getHasRock()
 										&& !person.isCarrying()) {
-									if(cycle.getDay()) {
+									if (cycle.getDay()) {
 										if (gotRock) {
 											person.giveRock(rock);
 											rock.setHasPerson(true);
@@ -324,6 +335,10 @@ public class Map {
 					tiles[i][j].paint(g);
 				}
 			}
+		}
+
+		for (int i = 0; i < lightSources.size(); i++) {
+			lightSources.get(i).paint(g);
 		}
 
 		for (int currentLayer = 0; currentLayer < size * 2; currentLayer++) {
@@ -434,9 +449,6 @@ public class Map {
 	public void addEntity(Item item, GameScreen gameScreen, UI ui) {
 		if (!activeTile.getRect().intersects(lake.getRect())) {
 			if (!activeTile.isOccupied() && gameScreen.hasCoins(item.getCost())) {
-				if (item.getName() == "Fire") {
-					Fire.available = false;
-				}
 				System.out.println("Spawning " + item.getName() + "..");
 				activeTile.setOccupied(true);
 				gameScreen.removeCoins(item.getCost());
@@ -445,6 +457,12 @@ public class Map {
 						+ tileSize / 2 - item.image.getHeight() / 2));
 				item.setTile(activeTile);
 				entities.add(item);
+				
+				if (item.getName() == "Fire") {
+					Fire.available = false;
+					LightSource lightSource = new LightSource(item.getPos());
+					lightSources.add(lightSource);
+				}
 			}
 		}
 	}

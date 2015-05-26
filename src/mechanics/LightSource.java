@@ -17,7 +17,7 @@ public class LightSource {
 
 	public LightSource(Vector2 pos) {
 		this.image = Main.resourceLoader.lightsource;
-		this.pos = new Vector2(pos.x - image.getWidth() / 2, pos.y
+		this.pos = new Vector2(pos.x - 17, pos.y - 5
 				+ image.getHeight() / 2);
 	}
 
@@ -27,7 +27,9 @@ public class LightSource {
 	}
 
 	public void paint(Graphics2D g) {
-		g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
+		if(active) {
+			g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
+		}
 	}
 
 	public boolean isActive() {

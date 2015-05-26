@@ -24,7 +24,6 @@ public class Main {
 	public static void main(String[] args) {
 
 		inputListener = new InputListener();
-
 		frame.add(game);
 		frame.setTitle(title); // Set the title of JFrame.
 		frame.setFocusable(true);
