@@ -96,10 +96,10 @@ public class Person extends Entity {
 	private Timer miningTimer = new Timer(3000, new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			rock.mine();
 			setHasRock(false);
 			setMining(false);
 			destinationPos = firePos;
-			rock.mine();
 			inventory.addRock(2);
 			carrying = true;
 			stamina -= 10;
@@ -171,7 +171,7 @@ public class Person extends Entity {
 
 		this.map = map;
 
-		if (!hasDestination && stamina > 5 && !carryingStockpile) {
+		if (!hasDestination && stamina > 5 && !carryingStockpile && !carrying) {
 			if (!hasTree && !hasRock) {
 
 				int getDestination = random.nextInt(500);
@@ -230,6 +230,10 @@ public class Person extends Entity {
 					this.stamina -= 2;
 				}
 			}
+		}
+
+		if (stamina < 0) {
+			stamina = 0;
 		}
 
 		if (gettingStamina) {
@@ -648,6 +652,7 @@ public class Person extends Entity {
 				inventory.removeRock();
 			}
 			carrying = false;
+			hasDestination = false;
 		}
 	}
 
