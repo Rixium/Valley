@@ -31,6 +31,7 @@ public class Tree extends Entity implements Serializable {
 	private boolean cut = false;
 
 	public Tree(Tile tile, Map map, boolean isSapling) {
+		this.entityName = "Tree";
 		this.image = Main.resourceLoader.tree;
 		this.isSapling = isSapling;
 		if (isSapling) {
@@ -40,7 +41,7 @@ public class Tree extends Entity implements Serializable {
 		} else {
 			age = 10;
 		}
-		this.entityName = "Tree";
+		
 		this.tile = tile;
 		this.pos = tile.getPos();
 		this.rect = new Rectangle(pos.x, pos.y, 64,

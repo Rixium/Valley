@@ -114,9 +114,11 @@ public class Person extends Entity implements Serializable {
 
 	public Person(Item fire, Map map, God god, boolean carryingStockpile,
 			Cycle cycle) {
-		godName = god.getName();
 		this.entityName = "Person";
+		godName = god.getName();
 		this.name = setName();
+		
+		
 		this.carryingStockpile = carryingStockpile;
 		this.cycle = cycle;
 
@@ -703,6 +705,8 @@ public class Person extends Entity implements Serializable {
 		person.tree = null;
 		person.atDestination = false;
 		person.hasDestination = false;
+		person.gettingStamina = false;
+		person.role = Role.normal;
 		return person;
     }
 

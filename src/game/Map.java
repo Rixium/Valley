@@ -70,28 +70,28 @@ public class Map implements Serializable {
 
 	private boolean setSourcesInactive = false;
 	private ArrayList<LightSource> lightSources = new ArrayList<LightSource>();
-	
+
 	private GameScreen gameScreen;
-	
+
 	public Map(String size, String treeGrowth, God god, GameScreen gameScreen) {
 		this.gameScreen = gameScreen;
 		population = 0;
 		this.god = god;
 		tileSize = 64;
-		if (size == "small") {
+		if (size.equals("small")) {
 			this.size = 32;
 			tiles = new Tile[32][32];
-		} else if (size == "medium") {
+		} else if (size.equals("medium")) {
 			this.size = 64;
 			tiles = new Tile[64][64];
-		} else if (size == "large") {
+		} else if (size.equals("large")) {
 			this.size = 128;
 			tiles = new Tile[128][128];
 		}
 
-		if (treeGrowth == "low") {
+		if (treeGrowth.equals("low")) {
 			this.treeGrowth = 40;
-		} else if (treeGrowth == "high") {
+		} else if (treeGrowth.equals("high")) {
 			this.treeGrowth = 20;
 		}
 
@@ -234,17 +234,15 @@ public class Map implements Serializable {
 							&& entity.getPos().y > -renderY - tileSize
 									- entity.image.getHeight()) {
 						entity.update(renderX, renderY, this, cycle);
-					} else if (entity.getEntityName() == "Person") {
-						entity.update(renderX, renderY, this, cycle);
 					}
 
-					if (entity.getEntityName() == "Tree" && thirstyTree == null) {
+					if (entity.getEntityName().equals("Tree") && thirstyTree == null) {
 						Tree tree = (Tree) entities.get(i);
 						if (tree.getThirst() >= 90 && tree.getIsSapling()
 								&& !tree.hasPerson()) {
 							thirstyTree = tree;
 						}
-					} else if (entity.getEntityName() == "Person") {
+					} else if (entity.getEntityName().equals("Person")) {
 						Person person = (Person) entities.get(i);
 						if (lake.getRect().contains(person.getRect())) {
 							person.setSwimming(true);
@@ -289,10 +287,7 @@ public class Map implements Serializable {
 								}
 							}
 						}
-					} else if (entity.getEntityName() == "Fire") {
-						fire = (Item) entities.get(i);
-						hasFire = true;
-					} else if (entity.getEntityName() == "Rock") {
+					} else if (entity.getEntityName().equals("Rock")) {
 						Rock tempRock = (Rock) entity;
 						if (!tempRock.getDead()
 								&& tempRock.getHasPerson() == false) {
@@ -381,18 +376,34 @@ public class Map implements Serializable {
 
 	public void mouseClicked(MouseEvent e) {
 		Rectangle mousePos = new Rectangle(e.getX(), e.getY() - 25, 1, 1);
-		
+
 		if (entities.size() > 0) {
 			for (int i = 0; i < entities.size(); i++) {
 				if (mousePos.intersects(entities.get(i).getRect())) {
-					if (entities.get(i).entityName.matches("Person")) {
-						if (selectedPerson != null) {
-							Person currentPerson = (Person) entities.get(i);
-							if (selectedPerson != null
-									&& selectedPerson.getName() != currentPerson
-											.getName()) {
-								selectedPerson.setSelected(false);
-								selectedPerson = currentPerson;
+					if (entities.get(i) != null) {
+						if (entities.get(i).entityName.matches("Person")) {
+							if (selectedPerson != null) {
+								Person currentPerson = (Person) entities.get(i);
+								if (selectedPerson != null
+										&& selectedPerson.getName() != currentPerson
+												.getName()) {
+									selectedPerson.setSelected(false);
+									selectedPerson = currentPerson;
+									selectedPerson.setSelected(true);
+									int randomVoice = random
+											.nextInt(Main.resourceLoader.voices.length);
+									Main.resourceLoader
+											.playClip(
+													Main.resourceLoader.voices[randomVoice],
+													-5f, false);
+								} else if (selectedPerson.getName() == currentPerson
+										.getName()) {
+									selectedPerson.setSelected(false);
+									selectedPerson = null;
+								}
+							} else {
+								System.out.println("selecting person");
+								selectedPerson = (Person) entities.get(i);
 								selectedPerson.setSelected(true);
 								int randomVoice = random
 										.nextInt(Main.resourceLoader.voices.length);
@@ -400,20 +411,7 @@ public class Map implements Serializable {
 										.playClip(
 												Main.resourceLoader.voices[randomVoice],
 												-5f, false);
-							} else if (selectedPerson.getName() == currentPerson
-									.getName()) {
-								selectedPerson.setSelected(false);
-								selectedPerson = null;
 							}
-						} else {
-							System.out.println("selecting person");
-							selectedPerson = (Person) entities.get(i);
-							selectedPerson.setSelected(true);
-							int randomVoice = random
-									.nextInt(Main.resourceLoader.voices.length);
-							Main.resourceLoader.playClip(
-									Main.resourceLoader.voices[randomVoice],
-									-5f, false);
 						}
 					}
 				}
@@ -454,7 +452,8 @@ public class Map implements Serializable {
 
 	public void addEntity(Item item, GameScreen gameScreen, UI ui) {
 		if (!activeTile.getRect().intersects(lake.getRect())) {
-			if (!activeTile.isOccupied() && gameScreen.getInstance().hasCoins(item.getCost())) {
+			if (!activeTile.isOccupied()
+					&& gameScreen.getInstance().hasCoins(item.getCost())) {
 				System.out.println("Spawning " + item.getName() + "..");
 				activeTile.setOccupied(true);
 				gameScreen.getInstance().removeCoins(item.getCost());
@@ -463,9 +462,11 @@ public class Map implements Serializable {
 						+ tileSize / 2 - item.image.getHeight() / 2));
 				item.setTile(activeTile);
 				entities.add(item);
-				
-				if (item.getName() == "Fire") {
+
+				if (item.getEntityName().matches("Fire")) {
 					Fire.available = false;
+					this.fire = (Fire) item;
+					hasFire = true;
 					LightSource lightSource = new LightSource(item.getPos());
 					lightSources.add(lightSource);
 				}

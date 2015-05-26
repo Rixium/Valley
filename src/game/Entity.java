@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -23,7 +24,7 @@ public class Entity implements Serializable {
 	protected Rectangle rect = new Rectangle(0, 0, 0, 0);
 	protected Map map;
 
-	protected String entityName;
+	protected String entityName = "Default";
 	protected Cycle cycle;
 
 	protected boolean selected;

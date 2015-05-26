@@ -17,6 +17,7 @@ public class Stockpile extends Entity implements Serializable {
 	private int rockcount;
 
 	public Stockpile(Vector2 pos) {
+		this.entityName = "Stockpile";
 		this.pos = new Vector2(pos.x, pos.y);
 
 		this.image = Main.resourceLoader.stockpile;
