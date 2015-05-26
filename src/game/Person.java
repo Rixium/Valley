@@ -1,10 +1,10 @@
 package game;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Random;
 
@@ -122,9 +122,9 @@ public class Person extends Entity implements Serializable {
 
 		this.inventory = new Inventory();
 
-		int head = random.nextInt(Main.resourceLoader.heads.length);
+		head = random.nextInt(Main.resourceLoader.heads.length);
 
-		int body = random.nextInt(Main.resourceLoader.bodies.length);
+		body = random.nextInt(Main.resourceLoader.bodies.length);
 
 		this.image = Main.resourceLoader.person;
 
@@ -368,15 +368,18 @@ public class Person extends Entity implements Serializable {
 		}
 
 		if (length > 10 || length < -10) {
-			if (pos.x > destinationPos.x) {
-				pos.x -= speed;
-			} else if (pos.x < destinationPos.x) {
-				pos.x += speed;
-			}
-			if (pos.y > destinationPos.y) {
-				pos.y -= speed;
-			} else if (pos.y < destinationPos.y) {
-				pos.y += speed;
+			int stroke = random.nextInt(5);
+			if(stroke == 1 || !swimming) {
+				if (pos.x > destinationPos.x) {
+						pos.x -= speed;
+				} else if (pos.x < destinationPos.x) {
+					pos.x += speed;
+				}
+				if (pos.y > destinationPos.y) {
+					pos.y -= speed;
+				} else if (pos.y < destinationPos.y) {
+					pos.y += speed;
+				}
 			}
 
 		}
@@ -687,5 +690,20 @@ public class Person extends Entity implements Serializable {
 	public boolean isCarrying() {
 		return this.carrying;
 	}
+	
+	private Object readResolve() throws ObjectStreamException {
+		Person person = this;
+		person.waterTimer.stop();
+		person.miningTimer.stop();
+		person.isMining = false;
+		person.isWatering = false;
+		person.hasTree= false;
+		person.hasRock = false;
+		person.rock = null;
+		person.tree = null;
+		person.atDestination = false;
+		person.hasDestination = false;
+		return person;
+    }
 
 }

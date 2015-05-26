@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -69,8 +70,11 @@ public class Map implements Serializable {
 
 	private boolean setSourcesInactive = false;
 	private ArrayList<LightSource> lightSources = new ArrayList<LightSource>();
-
-	public Map(String size, String treeGrowth, God god) {
+	
+	private GameScreen gameScreen;
+	
+	public Map(String size, String treeGrowth, God god, GameScreen gameScreen) {
+		this.gameScreen = gameScreen;
 		population = 0;
 		this.god = god;
 		tileSize = 64;
@@ -377,7 +381,7 @@ public class Map implements Serializable {
 
 	public void mouseClicked(MouseEvent e) {
 		Rectangle mousePos = new Rectangle(e.getX(), e.getY() - 25, 1, 1);
-
+		
 		if (entities.size() > 0) {
 			for (int i = 0; i < entities.size(); i++) {
 				if (mousePos.intersects(entities.get(i).getRect())) {
@@ -401,7 +405,8 @@ public class Map implements Serializable {
 								selectedPerson.setSelected(false);
 								selectedPerson = null;
 							}
-						} else if (selectedPerson == null) {
+						} else {
+							System.out.println("selecting person");
 							selectedPerson = (Person) entities.get(i);
 							selectedPerson.setSelected(true);
 							int randomVoice = random
@@ -449,10 +454,10 @@ public class Map implements Serializable {
 
 	public void addEntity(Item item, GameScreen gameScreen, UI ui) {
 		if (!activeTile.getRect().intersects(lake.getRect())) {
-			if (!activeTile.isOccupied() && gameScreen.hasCoins(item.getCost())) {
+			if (!activeTile.isOccupied() && gameScreen.getInstance().hasCoins(item.getCost())) {
 				System.out.println("Spawning " + item.getName() + "..");
 				activeTile.setOccupied(true);
-				gameScreen.removeCoins(item.getCost());
+				gameScreen.getInstance().removeCoins(item.getCost());
 				item.setPosition(new Vector2(activeTile.getPos().x + tileSize
 						/ 2 - item.image.getWidth() / 2, activeTile.getPos().y
 						+ tileSize / 2 - item.image.getHeight() / 2));
