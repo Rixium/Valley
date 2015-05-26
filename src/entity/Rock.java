@@ -29,20 +29,26 @@ public class Rock extends Entity {
 		if (!dead) {
 			g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
 		} else {
-			g.drawImage(Main.resourceLoader.rockMined, pos.x + renderX, pos.y + renderY,  null);
+			g.drawImage(Main.resourceLoader.rockMined, pos.x + renderX, pos.y
+					+ renderY, null);
 		}
 	}
 
 	public void mine() {
 		dead = true;
+		hasPerson = false;
 	}
-	
+
 	public boolean getHasPerson() {
 		return this.hasPerson;
 	}
-	
+
 	public boolean getDead() {
 		return this.dead;
+	}
+
+	public void setHasPerson(boolean bool) {
+		this.hasPerson = bool;
 	}
 
 }

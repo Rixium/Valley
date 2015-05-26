@@ -62,7 +62,7 @@ public class ResourceLoader {
 	public BufferedImage sapling;
 	public BufferedImage rock;
 	public BufferedImage rockMined;
-	
+
 	public BufferedImage cow;
 
 	public boolean menuMusicPlaying;
@@ -71,6 +71,7 @@ public class ResourceLoader {
 
 	public BufferedImage fireImage;
 	public BufferedImage lake;
+	public BufferedImage stockpile;
 
 	// Item Buttons
 
@@ -100,11 +101,11 @@ public class ResourceLoader {
 	public BufferedImage mining;
 	public BufferedImage strength;
 	public BufferedImage woodcutting;
-	
+
 	// Voices
-	
+
 	public Clip[] voices = new Clip[4];
-	
+
 	// Role objects
 	public BufferedImage wateringcan;
 	public BufferedImage pickaxe;
@@ -127,12 +128,12 @@ public class ResourceLoader {
 		uiBackground = getBufferedImage("res/uiBackground.png");
 		personStatScreen = getBufferedImage("res/personStatScreen.png");
 		openUI = loadClip("/openUI.wav");
-		
+
 		voices[0] = loadClip("/voices/man1.wav");
 		voices[1] = loadClip("/voices/man2.wav");
 		voices[2] = loadClip("/voices/man3.wav");
 		voices[3] = loadClip("/voices/man4.wav");
-		
+
 		tree = getBufferedImage("res/gameobjects/tree.png");
 		treeBottomCut = getBufferedImage("res/gameobjects/treebottomcut.png");
 
@@ -191,12 +192,13 @@ public class ResourceLoader {
 		emptyButton = getBufferedImage("res/buttons/empty.png");
 		buildButton = getBufferedImage("res/buttons/build.png");
 		loadImage = getBufferedImage("res/loadImage.png");
-		
+
 		wateringcan = getBufferedImage("res/skillobjects/wateringcan.png");
 		pickaxe = getBufferedImage("res/skillobjects/pickaxe.png");
-		
+
 		rock = getBufferedImage("res/gameobjects/rock.png");
 		rockMined = getBufferedImage("res/gameobjects/rockMined.png");
+		stockpile = getBufferedImage("res/gameobjects/stockpile.png");
 	}
 
 	public Clip loadClip(String filename) {

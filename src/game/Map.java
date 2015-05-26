@@ -59,6 +59,9 @@ public class Map {
 	private boolean isReady = false;
 
 	private Stockpile stockpile;
+	private boolean hasStockpile = false;
+
+	private boolean giveStockpile = true;
 
 	public Map(String size, String treeGrowth, God god) {
 		population = 0;
@@ -82,7 +85,6 @@ public class Map {
 		}
 
 		hasFire = false;
-		stockpile = new Stockpile();
 		createMap();
 	}
 
@@ -247,12 +249,18 @@ public class Map {
 								}
 							}
 						} else if (person.getRole() == Role.miner) {
-							if (person.getStamina() > 5 && !person.isMining()
-									&& !person.getHasRock() && gotRock
-									&& !rock.getHasPerson()) {
-								person.giveRock(rock);
-								rock = null;
-								gotRock = false;
+							if (person.getStamina() > 5
+									&& !person.isGettingStamina()) {
+								if (!person.getHasRock()
+										&& !person.isCarrying()) {
+									if (gotRock) {
+										person.giveRock(rock);
+										rock.setHasPerson(true);
+										rock = null;
+										gotRock = false;
+										System.out.println("Giving Rock");
+									}
+								}
 							}
 						}
 					} else if (entity.getEntityName() == "Fire") {
@@ -260,7 +268,8 @@ public class Map {
 						hasFire = true;
 					} else if (entity.getEntityName() == "Rock") {
 						Rock tempRock = (Rock) entity;
-						if (!tempRock.getDead()) {
+						if (!tempRock.getDead()
+								&& tempRock.getHasPerson() == false) {
 							rock = (Rock) entity;
 							gotRock = true;
 						}
@@ -283,7 +292,9 @@ public class Map {
 							System.out.println("Spawning Person..");
 
 							population++;
-							Person person = new Person(fire, this, god);
+							Person person = new Person(fire, this, god,
+									giveStockpile);
+							giveStockpile = false;
 							entities.add(person);
 						}
 					}
@@ -388,6 +399,13 @@ public class Map {
 				}
 			}
 		}
+
+		if (stockpile != null) {
+			if (mousePos.intersects(stockpile.getRect())) {
+				System.out.println("WoodCount: " + stockpile.getWood());
+				System.out.println("RockCount: " + stockpile.getRock());
+			}
+		}
 	}
 
 	public void setMousePos(Rectangle rect) {
@@ -450,5 +468,15 @@ public class Map {
 
 	public Stockpile getStockpile() {
 		return this.stockpile;
+	}
+
+	public boolean getHasStockpile() {
+		return this.hasStockpile;
+	}
+
+	public void dropStockpile(Vector2 pos) {
+		this.stockpile = new Stockpile(new Vector2(pos.x, pos.y));
+		entities.add(stockpile);
+		hasStockpile = true;
 	}
 }

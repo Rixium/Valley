@@ -75,6 +75,7 @@ public class Person extends Entity {
 	private Inventory inventory;
 
 	private boolean carrying = false;
+	private boolean carryingStockpile;
 
 	private Timer waterTimer = new Timer(3000, new ActionListener() {
 		@Override
@@ -86,6 +87,7 @@ public class Person extends Entity {
 			tree.water();
 			inventory.addWood(2);
 			carrying = true;
+			stamina -= 10;
 			tree = null;
 			((Timer) e.getSource()).stop();
 		}
@@ -100,15 +102,17 @@ public class Person extends Entity {
 			rock.mine();
 			inventory.addRock(2);
 			carrying = true;
+			stamina -= 10;
 			rock = null;
 			((Timer) e.getSource()).stop();
 		}
 	});
 
-	public Person(Item fire, Map map, God god) {
+	public Person(Item fire, Map map, God god, boolean carryingStockpile) {
 		godName = god.getName();
 		this.entityName = "Person";
 		this.name = setName();
+		this.carryingStockpile = carryingStockpile;
 
 		this.inventory = new Inventory();
 
@@ -124,7 +128,7 @@ public class Person extends Entity {
 		this.firePos = new Vector2(fire.getPos().x + fire.getImage().getWidth()
 				/ 2, fire.getPos().y + fire.getImage().getHeight() / 2);
 
-		this.speed = 2;
+		this.speed = 1;
 
 		int randomSpawnSideX = random
 				.nextInt(map.getSize() * map.getTileSize());
@@ -167,7 +171,7 @@ public class Person extends Entity {
 
 		this.map = map;
 
-		if (!hasDestination && stamina > 5 && !carrying) {
+		if (!hasDestination && stamina > 5 && !carryingStockpile) {
 			if (!hasTree && !hasRock) {
 
 				int getDestination = random.nextInt(500);
@@ -193,6 +197,11 @@ public class Person extends Entity {
 					}
 				}
 			}
+		} else if (carrying) {
+			destinationPos = new Vector2(map.getStockpile().getPos().x, map
+					.getStockpile().getPos().y);
+			hasDestination = true;
+			atDestination = false;
 		}
 
 		this.renderX = renderX;
@@ -202,9 +211,11 @@ public class Person extends Entity {
 				+ (firePos.y - pos.y) * (firePos.y - pos.y));
 
 		if (fireDistance <= 10 && stamina < 100 && gettingStamina) {
-			carrying = false;
 
-			clearInventory();
+			if (carryingStockpile) {
+				map.dropStockpile(pos);
+				carryingStockpile = false;
+			}
 
 			int addStamina = random.nextInt(10);
 			if (addStamina == 1) {
@@ -213,7 +224,11 @@ public class Person extends Entity {
 		} else if (stamina > 0) {
 			int loseStamina = random.nextInt(100);
 			if (loseStamina == 1) {
-				this.stamina--;
+				if (!carrying) {
+					this.stamina--;
+				} else {
+					this.stamina -= 2;
+				}
 			}
 		}
 
@@ -225,7 +240,7 @@ public class Person extends Entity {
 			}
 		}
 
-		if (stamina <= 5 || carrying) {
+		if (stamina <= 5) {
 			hasTree = false;
 			hasRock = false;
 			rock = null;
@@ -233,14 +248,19 @@ public class Person extends Entity {
 			destinationPos = firePos;
 			gettingStamina = true;
 			if (!hasDestination) {
-				int distanceFireX = random.nextInt(100);
-				distanceFireX -= 50;
-				destinationPos.x += distanceFireX;
+				if (!carryingStockpile) {
+					int distanceFireX = random.nextInt(100);
+					distanceFireX -= 50;
+					destinationPos.x += distanceFireX;
 
-				int distanceFireY = random.nextInt(100);
-				distanceFireY -= 50;
-				destinationPos.y += distanceFireY;
-				hasDestination = true;
+					int distanceFireY = random.nextInt(100);
+					distanceFireY -= 50;
+					destinationPos.y += distanceFireY;
+					hasDestination = true;
+				} else {
+					destinationPos.x += 40;
+					hasDestination = true;
+				}
 			}
 		}
 
@@ -317,11 +337,25 @@ public class Person extends Entity {
 			if (gettingStamina == false) {
 				hasDestination = false;
 			}
+			if (carrying) {
+				if (map.getHasStockpile()) {
+					clearInventory();
+				}
+			}
 		}
 
 		if (length > 10 || length < -10) {
-			pos.x += directionX * speed;
-			pos.y += directionY * speed;
+			if (pos.x > destinationPos.x) {
+				pos.x -= speed;
+			} else if (pos.x < destinationPos.x) {
+				pos.x += speed;
+			}
+			if (pos.y > destinationPos.y) {
+				pos.y -= speed;
+			} else if (pos.y < destinationPos.y) {
+				pos.y += speed;
+			}
+
 		}
 
 		super.update(renderX, renderY, map);
@@ -554,7 +588,7 @@ public class Person extends Entity {
 	}
 
 	public void giveTree(Tree tree) {
-		if (!hasTree && !gettingStamina) {
+		if (!hasTree && !gettingStamina && !carrying) {
 			hasDestination = true;
 			atDestination = false;
 			hasTree = true;
@@ -589,7 +623,7 @@ public class Person extends Entity {
 	}
 
 	public void giveRock(Rock rock) {
-		if (!hasRock && !gettingStamina) {
+		if (!hasRock && !gettingStamina && !carrying) {
 			hasDestination = true;
 			atDestination = false;
 			hasRock = true;
@@ -597,19 +631,32 @@ public class Person extends Entity {
 			this.rock = rock;
 		}
 	}
-	
+
 	public void clearInventory() {
-		Stockpile stockpile = map.getStockpile();
-		if(inventory.getWoodCount() > 0) {
-			System.out.println("Adding " + inventory.getWoodCount() + " Wood to the Stockpile.");
-			stockpile.addWood(inventory.getWoodCount());
-			inventory.removeWood();
+		if (map.getHasStockpile()) {
+			Stockpile stockpile = map.getStockpile();
+			if (inventory.getWoodCount() > 0) {
+				System.out.println("Adding " + inventory.getWoodCount()
+						+ " Wood to the Stockpile.");
+				stockpile.addWood(inventory.getWoodCount());
+				inventory.removeWood();
+			}
+			if (inventory.getRockCount() > 0) {
+				System.out.println("Adding " + inventory.getRockCount()
+						+ " Rock to the Stockpile.");
+				stockpile.addRock(inventory.getRockCount());
+				inventory.removeRock();
+			}
+			carrying = false;
 		}
-		if(inventory.getRockCount() > 0) {
-			System.out.println("Adding " + inventory.getRockCount() + " Rock to the Stockpile.");
-			stockpile.addRock(inventory.getRockCount());
-			inventory.removeRock();
-		}
+	}
+
+	public boolean getHasStockpile() {
+		return this.carryingStockpile;
+	}
+
+	public boolean isCarrying() {
+		return this.carrying;
 	}
 
 }
