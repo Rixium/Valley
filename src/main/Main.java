@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Dimension;
+import java.io.Serializable;
 
 import javax.swing.JFrame;
 

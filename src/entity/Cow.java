@@ -5,12 +5,13 @@ import game.Map;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.Random;
 
 import main.Main;
 import math.Vector2;
 
-public class Cow extends Entity {
+public class Cow extends Entity implements Serializable {
 
 	private Random random = new Random();
 

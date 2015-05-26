@@ -3,6 +3,7 @@ package screen;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 import main.Main;
 import math.Vector2;

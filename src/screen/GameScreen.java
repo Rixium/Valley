@@ -14,13 +14,18 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 import main.Main;
 import math.Vector2;
 import mechanics.Cycle;
 import object.Button;
 
-public class GameScreen extends Screen {
+public class GameScreen extends Screen implements Serializable {
 
 	private Map map;
 	private UI ui;
@@ -188,6 +193,30 @@ public class GameScreen extends Screen {
 		} else if (e.getKeyCode() == 83) {
 			moveMapUp = false;
 			moveMapDown = true;
+		}
+		
+		if(e.getKeyCode() == 123) {
+			FileOutputStream f_out = null;
+			ObjectOutputStream obj_out = null;
+			try {
+				f_out = new FileOutputStream("mymap.map");
+			} catch (FileNotFoundException ex) {
+				ex.printStackTrace();
+			}
+			
+			try {
+				obj_out = new ObjectOutputStream (f_out);
+			} catch (IOException ex) {
+				// TODO Auto-generated catch block
+				ex.printStackTrace();
+			}
+			
+			try {
+				obj_out.writeObject(this);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
 		}
 
 	}

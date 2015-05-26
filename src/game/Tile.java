@@ -2,16 +2,22 @@ package game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import javax.imageio.ImageIO;
 
 import main.Main;
 import math.Vector2;
 
-public class Tile {
+public class Tile implements Serializable {
 
 	private Vector2 pos;
-	private Image image;
+	transient private BufferedImage image;
 	private int tileSize;
 	
 	private int renderX;
@@ -145,4 +151,14 @@ public class Tile {
 		this.showRole = bool;
 	}
 
+	private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        ImageIO.write(image, "png", out);
+    }
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		image = ImageIO.read(in);
+    }
+	
 }

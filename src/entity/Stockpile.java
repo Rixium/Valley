@@ -5,12 +5,13 @@ import game.Map;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 import main.Main;
 import math.Vector2;
 import mechanics.Cycle;
 
-public class Stockpile extends Entity {
+public class Stockpile extends Entity implements Serializable {
 
 	private int woodcount;
 	private int rockcount;

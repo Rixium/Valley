@@ -7,13 +7,19 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import javax.imageio.ImageIO;
 
 import main.Main;
 import math.Vector2;
 
-public class Button {
+public class Button implements Serializable {
 
-	BufferedImage image;
+	transient BufferedImage image;
 	private boolean selected;
 	Vector2 pos;
 	Rectangle rect;
@@ -81,4 +87,14 @@ public class Button {
 	public void setSelected(boolean bool) {
 		this.selected = bool;
 	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.defaultWriteObject();
+        ImageIO.write(image, "png", out);
+    }
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		image = ImageIO.read(in);
+    }
 }

@@ -1,6 +1,8 @@
 package game;
 
-public class Role {
+import java.io.Serializable;
+
+public class Role implements Serializable {
 
 	public static int normal = -1;
 	public static int fighter = 0;

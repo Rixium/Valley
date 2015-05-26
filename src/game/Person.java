@@ -1,10 +1,11 @@
 package game;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.Random;
 
 import javax.swing.Timer;
@@ -17,7 +18,7 @@ import entity.Rock;
 import entity.Stockpile;
 import entity.Tree;
 
-public class Person extends Entity {
+public class Person extends Entity implements Serializable {
 
 	private Item fire;
 	private Vector2 firePos;
@@ -33,8 +34,8 @@ public class Person extends Entity {
 
 	private int hunger;
 
-	private BufferedImage head;
-	private BufferedImage body;
+	private int head;
+	private int body;
 
 	private int woodcutting;
 	private int mining;
@@ -121,11 +122,9 @@ public class Person extends Entity {
 
 		this.inventory = new Inventory();
 
-		int randomHead = random.nextInt(Main.resourceLoader.heads.length);
-		this.head = Main.resourceLoader.heads[randomHead];
+		int head = random.nextInt(Main.resourceLoader.heads.length);
 
-		int randomBody = random.nextInt(Main.resourceLoader.bodies.length);
-		this.body = Main.resourceLoader.bodies[randomBody];
+		int body = random.nextInt(Main.resourceLoader.bodies.length);
 
 		this.image = Main.resourceLoader.person;
 
@@ -388,13 +387,18 @@ public class Person extends Entity {
 
 	public void paint(Graphics2D g) {
 		if (!swimming) {
-			g.drawImage(body, pos.x + renderX, pos.y + head.getHeight()
-					+ renderY, null);
-			g.drawImage(head, pos.x + renderX, pos.y + renderY, null);
+			g.drawImage(Main.resourceLoader.heads[head], pos.x + renderX,
+					pos.y + renderY, null);
+			g.drawImage(
+					Main.resourceLoader.bodies[body],
+					pos.x + renderX,
+					pos.y + renderY
+							+ Main.resourceLoader.heads[head].getHeight(), null);
 		} else {
 			g.drawImage(Main.resourceLoader.swimming, pos.x + renderX, pos.y
 					+ renderY + 5, null);
-			g.drawImage(head, pos.x + renderX, pos.y + renderY, null);
+			g.drawImage(Main.resourceLoader.heads[head], pos.x + renderX, pos.y
+					+ renderY, null);
 		}
 
 		if (isWatering) {

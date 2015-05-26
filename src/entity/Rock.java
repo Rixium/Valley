@@ -4,11 +4,12 @@ import game.Entity;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 import main.Main;
 import math.Vector2;
 
-public class Rock extends Entity {
+public class Rock extends Entity implements Serializable {
 
 	private boolean dead = false;
 	private boolean hasPerson = false;

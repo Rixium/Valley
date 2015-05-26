@@ -6,12 +6,13 @@ import game.Map;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 import main.Main;
 import math.Vector2;
 import mechanics.Cycle;
 
-public class Lake extends Entity {
+public class Lake extends Entity implements Serializable {
 
 	public Lake(Vector2 pos) {
 		System.out.println("Spawning Lake at: " + pos.x + " | " + pos.y + ".");

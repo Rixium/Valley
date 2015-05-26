@@ -1,6 +1,8 @@
 package game;
 
-public class TileRoles {
+import java.io.Serializable;
+
+public class TileRoles implements Serializable {
 
 	public static final int EMPTY = 0;
 	public static final int FARM = 1;

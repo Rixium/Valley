@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;

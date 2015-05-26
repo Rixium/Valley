@@ -5,11 +5,12 @@ import game.Map;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 import main.Main;
 import math.Vector2;
 
-public class Fire extends Item {
+public class Fire extends Item implements Serializable {
 
 	public Fire() {
 		this.entityName = "Fire";
@@ -26,9 +27,9 @@ public class Fire extends Item {
 		this.itemName = "Fire";
 		this.price = 0;
 		this.pos = pos;
+		this.layer = pos.y / map.getSize() * map.getTileSize();
 		this.buttonImage = Main.resourceLoader.fireButtonImage;
 		this.image = Main.resourceLoader.fireImage;
-		this.layer = pos.y / map.getSize() * map.getTileSize();
 		this.rect = new Rectangle(pos.x, pos.y, image.getWidth(), image.getHeight());
 	}
 	

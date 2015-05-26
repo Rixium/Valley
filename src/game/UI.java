@@ -7,18 +7,22 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import javax.imageio.ImageIO;
 
 import main.Main;
 import math.Vector2;
 import object.Button;
 
-public class UI {
+public class UI implements Serializable {
 
 	private Vector2 closedVector;
 	private Vector2 openVector;
 	private Rectangle openRect;
-	private Image image;
-	private BufferedImage personStatScreenImage;
 
 	private boolean uiOpen;
 	private boolean showingPersonStats;
@@ -29,37 +33,27 @@ public class UI {
 
 	private Person selectedPerson;
 
-	private BufferedImage[] statImages = new BufferedImage[7];
 
 	public UI() {
 
-		image = Main.resourceLoader.uiBackground;
-		personStatScreenImage = Main.resourceLoader.personStatScreen;
-
 		closedVector = new Vector2(Main.GAME_WIDTH - 30, 0);
-		openVector = new Vector2(Main.GAME_WIDTH - image.getWidth(null), 0);
+		openVector = new Vector2(Main.GAME_WIDTH - Main.resourceLoader.uiBackground.getWidth(null), 0);
 		openRect = new Rectangle(closedVector.x, closedVector.y, 50,
 				Main.GAME_HEIGHT);
 
 		items[0] = new Button(new Fire(), new Vector2(openVector.x + 25,
 				openVector.y + 10));
 
-		statImages[0] = Main.resourceLoader.cooking;
-		statImages[1] = Main.resourceLoader.farming;
-		statImages[2] = Main.resourceLoader.fishing;
-		statImages[3] = Main.resourceLoader.mining;
-		statImages[4] = Main.resourceLoader.woodcutting;
-
-		stats[0] = new Button(statImages[0], new Vector2(100, Main.GAME_HEIGHT
-				/ 2 - personStatScreenImage.getHeight() + 110));
-		stats[1] = new Button(statImages[1], new Vector2(100, Main.GAME_HEIGHT
-				/ 2 - personStatScreenImage.getHeight() + 160));
-		stats[2] = new Button(statImages[2], new Vector2(100, Main.GAME_HEIGHT
-				/ 2 - personStatScreenImage.getHeight() + 210));
-		stats[3] = new Button(statImages[3], new Vector2(100, Main.GAME_HEIGHT
-				/ 2 - personStatScreenImage.getHeight() + 260));
-		stats[4] = new Button(statImages[4], new Vector2(100, Main.GAME_HEIGHT
-				/ 2 - personStatScreenImage.getHeight() + 310));
+		stats[0] = new Button(Main.resourceLoader.cooking, new Vector2(100, Main.GAME_HEIGHT
+				/ 2 - Main.resourceLoader.personStatScreen.getHeight() + 110));
+		stats[1] = new Button(Main.resourceLoader.farming, new Vector2(100, Main.GAME_HEIGHT
+				/ 2 - Main.resourceLoader.personStatScreen.getHeight() + 160));
+		stats[2] = new Button(Main.resourceLoader.fishing, new Vector2(100, Main.GAME_HEIGHT
+				/ 2 - Main.resourceLoader.personStatScreen.getHeight() + 210));
+		stats[3] = new Button(Main.resourceLoader.mining, new Vector2(100, Main.GAME_HEIGHT
+				/ 2 - Main.resourceLoader.personStatScreen.getHeight() + 260));
+		stats[4] = new Button(Main.resourceLoader.woodcutting, new Vector2(100, Main.GAME_HEIGHT
+				/ 2 - Main.resourceLoader.personStatScreen.getHeight() + 310));
 
 		tileRoles[0] = new Button(Main.resourceLoader.emptyButton, new Vector2(
 				20, 20));
@@ -80,8 +74,8 @@ public class UI {
 
 	public void paint(Graphics2D g) {
 		if (uiOpen) {
-			g.drawImage(image, openVector.x, openVector.y,
-					image.getWidth(null), Main.GAME_HEIGHT, null);
+			g.drawImage(Main.resourceLoader.uiBackground, openVector.x, openVector.y,
+					Main.resourceLoader.uiBackground.getWidth(null), Main.GAME_HEIGHT, null);
 			openRect.x = openVector.x;
 			openRect.y = openVector.y;
 
@@ -90,58 +84,58 @@ public class UI {
 			}
 
 		} else if (!uiOpen) {
-			g.drawImage(image, closedVector.x, closedVector.y,
-					image.getWidth(null), Main.GAME_HEIGHT, null);
+			g.drawImage(Main.resourceLoader.uiBackground, closedVector.x, closedVector.y,
+					Main.resourceLoader.uiBackground.getWidth(), Main.GAME_HEIGHT, null);
 			openRect.x = closedVector.x;
 			openRect.y = closedVector.y;
 		}
 
 		if (showingPersonStats) {
-			g.drawImage(personStatScreenImage, 30, Main.GAME_HEIGHT / 2
-					- personStatScreenImage.getHeight(),
-					personStatScreenImage.getWidth() * 2,
-					personStatScreenImage.getHeight() * 2, null);
+			g.drawImage(Main.resourceLoader.personStatScreen, 30, Main.GAME_HEIGHT / 2
+					- Main.resourceLoader.personStatScreen.getHeight(),
+					Main.resourceLoader.personStatScreen.getWidth() * 2,
+					Main.resourceLoader.personStatScreen.getHeight() * 2, null);
 			g.setColor(Color.WHITE);
 
 			g.drawString("Name: " + selectedPerson.getName(), 100,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 70);
 			g.drawString("Health: " + selectedPerson.getHealth(), 100,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 85);
 			g.drawString("Stamina: " + selectedPerson.getStamina(), 100,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 100);
 
 			stats[0].paint(g);
 			g.drawString("" + selectedPerson.getCooking(), 150,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 130);
 
 			stats[1].paint(g);
 			g.drawString("" + selectedPerson.getFarming(), 150,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 180);
 
 			stats[2].paint(g);
 			g.drawString("" + selectedPerson.getFishing(), 150,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 230);
 
 			stats[3].paint(g);
 			g.drawString("" + selectedPerson.getMining(), 150, Main.GAME_HEIGHT
-					/ 2 - personStatScreenImage.getHeight() + 280);
+					/ 2 - Main.resourceLoader.personStatScreen.getHeight() + 280);
 
 			stats[4].paint(g);
 			g.drawString("" + selectedPerson.getWoodcutting(), 150,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 330);
 
 			g.drawString("Thinking: " + selectedPerson.getThought(), 100,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 370);
 			g.drawString("Current Job: " + selectedPerson.getCurrentJob(), 100,
-					Main.GAME_HEIGHT / 2 - personStatScreenImage.getHeight()
+					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 385);
 
 			g.setColor(Color.red);
@@ -195,4 +189,5 @@ public class UI {
 	public Button[] getTileRoles() {
 		return this.tileRoles;
 	}
+	
 }

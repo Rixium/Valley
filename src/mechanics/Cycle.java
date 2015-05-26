@@ -5,15 +5,19 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 import main.Main;
 import math.Vector2;
 
-public class Cycle {
+public class Cycle implements Serializable {
 
-	private BufferedImage image;
 	private Vector2 pos;
 
 	private float time;
@@ -57,7 +61,6 @@ public class Cycle {
 	});
 
 	public Cycle() {
-		this.image = Main.resourceLoader.cycle;
 		this.pos = new Vector2(0, 0);
 		this.time = 0f;
 		dayTimer.start();
@@ -70,7 +73,7 @@ public class Cycle {
 	public void paint(Graphics2D g) {
 		g.setComposite(AlphaComposite
 				.getInstance(AlphaComposite.SRC_OVER, time));
-		g.drawImage(image, pos.x, pos.y, Main.GAME_WIDTH * 2,
+		g.drawImage(Main.resourceLoader.cycle, pos.x, pos.y, Main.GAME_WIDTH * 2,
 				Main.GAME_HEIGHT * 2, null);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 	}
@@ -78,4 +81,5 @@ public class Cycle {
 	public boolean getDay() {
 		return isDay;
 	}
+	
 }

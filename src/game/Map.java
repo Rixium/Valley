@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,7 +21,7 @@ import entity.Rock;
 import entity.Stockpile;
 import entity.Tree;
 
-public class Map {
+public class Map implements Serializable {
 
 	private Tile[][] tiles;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();

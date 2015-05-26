@@ -2,13 +2,18 @@ package mechanics;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import javax.imageio.ImageIO;
 
 import main.Main;
 import math.Vector2;
 
-public class LightSource {
+public class LightSource implements Serializable {
 
-	private BufferedImage image;
 	private Vector2 pos;
 	private boolean active;
 
@@ -16,9 +21,8 @@ public class LightSource {
 	private int renderY;
 
 	public LightSource(Vector2 pos) {
-		this.image = Main.resourceLoader.lightsource;
 		this.pos = new Vector2(pos.x - 17, pos.y - 5
-				+ image.getHeight() / 2);
+				+ Main.resourceLoader.lightsource.getHeight() / 2);
 	}
 
 	public void update(int renderX, int renderY) {
@@ -28,7 +32,7 @@ public class LightSource {
 
 	public void paint(Graphics2D g) {
 		if(active) {
-			g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
+			g.drawImage(Main.resourceLoader.lightsource, pos.x + renderX, pos.y + renderY, null);
 		}
 	}
 
@@ -47,5 +51,6 @@ public class LightSource {
 	public void setPos(Vector2 pos) {
 		this.pos = pos;
 	}
+	
 
 }

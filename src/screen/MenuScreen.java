@@ -6,6 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import javax.swing.Timer;
 
@@ -97,11 +101,45 @@ public class MenuScreen extends Screen {
 			} else if (mouseRect.intersects(buttons[0].getRect())) {
 				Main.resourceLoader.playClip(Main.resourceLoader.menuClick, 1f, false);
 				Main.game.setScreen(new MapScreen());
+			} else if(mouseRect.intersects(buttons[1].getRect())) {
+				loadGame();
 			}
 		} else {
 			menuTitlePos.y = endMenuTitlePos.y;
 			showButtons = true;
 		}
+	}
+	
+	public void loadGame() {
+		FileInputStream f_in = null;
+		try {
+			f_in = new 
+					FileInputStream("mymap.map");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+			// Read object using ObjectInputStream
+			ObjectInputStream obj_in = null;
+			try {
+				obj_in = new ObjectInputStream (f_in);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// Read an object
+			try {
+				GameScreen gameScreen = (GameScreen)obj_in.readObject();
+				Main.game.setScreen(gameScreen);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	
 }

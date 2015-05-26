@@ -1,6 +1,8 @@
 package Person;
 
-public class Inventory {
+import java.io.Serializable;
+
+public class Inventory implements Serializable {
 
 	private int rockcount = 0;
 	private int woodcount = 0;

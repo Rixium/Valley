@@ -2,6 +2,7 @@ package main;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -46,9 +47,7 @@ public class Game extends JPanel implements Runnable {
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 		currentScreen = new SplashScreen();
-		
-		
-		
+
 		running = true;
 		Thread thread = new Thread(this);
 		thread.start();

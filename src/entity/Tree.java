@@ -7,31 +7,31 @@ import game.Tile;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import main.Main;
 import math.Vector2;
 import mechanics.Cycle;
 
-public class Tree extends Entity {
+public class Tree extends Entity implements Serializable {
 
 	private boolean canCut;
 	private boolean isSapling;
-	private BufferedImage saplingImage;
 	private int thirst = 0;
 	private int age;
 	private Random random = new Random();
 	private boolean hasPerson = false;
 	private boolean cut = false;
 
-	private BufferedImage treeTop;
-	private BufferedImage treeBottom;
-
 	public Tree(Tile tile, Map map, boolean isSapling) {
 		this.image = Main.resourceLoader.tree;
-		saplingImage = Main.resourceLoader.sapling;
-		treeTop = Main.resourceLoader.treeTop;
-		treeBottom = Main.resourceLoader.treeBottom;
 		this.isSapling = isSapling;
 		if (isSapling) {
 			canCut = false;
@@ -43,8 +43,8 @@ public class Tree extends Entity {
 		this.entityName = "Tree";
 		this.tile = tile;
 		this.pos = tile.getPos();
-		this.rect = new Rectangle(pos.x, pos.y, treeTop.getWidth(),
-				treeTop.getHeight());
+		this.rect = new Rectangle(pos.x, pos.y, 64,
+				64);
 		this.layer = (pos.y + 10) / map.getSize();
 	}
 
@@ -79,16 +79,16 @@ public class Tree extends Entity {
 	public void paint(Graphics2D g) {
 		if (!isSapling) {
 			if (!cut) {
-				g.drawImage(treeTop, pos.x + renderX, pos.y + renderY
-						- treeBottom.getHeight(), null);
-				g.drawImage(treeBottom, pos.x + renderX, pos.y + renderY, null);
+				g.drawImage(Main.resourceLoader.treeTop, pos.x + renderX, pos.y + renderY
+						- Main.resourceLoader.treeBottom.getHeight(), null);
+				g.drawImage(Main.resourceLoader.treeBottom, pos.x + renderX, pos.y + renderY, null);
 			} else {
 				g.drawImage(Main.resourceLoader.treeBottomCut, pos.x + renderX,
 						pos.y + renderY, null);
 			}
 
 		} else if (isSapling) {
-			g.drawImage(saplingImage, pos.x + renderX, pos.y + renderY, null);
+			g.drawImage(Main.resourceLoader.sapling, pos.x + renderX, pos.y + renderY, null);
 		}
 	}
 
@@ -138,4 +138,5 @@ public class Tree extends Entity {
 	public int getAge() {
 		return this.age;
 	}
+	
 }

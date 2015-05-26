@@ -3,18 +3,25 @@ package game;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
+import javax.imageio.ImageIO;
+
+import main.Main;
 import math.Vector2;
 
 
-public class Item extends Entity {
+public class Item extends Entity implements Serializable {
 
 	protected int price;
 	protected String itemName;
 	
 	public static boolean available = false;
 	
-	protected BufferedImage buttonImage;
+	transient protected BufferedImage buttonImage;
 	
 	protected Rectangle rect;
 	
@@ -63,4 +70,13 @@ public class Item extends Entity {
 		this.available = available;
 	}
 
+	private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        ImageIO.write(buttonImage, "png", out);
+    }
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		buttonImage = ImageIO.read(in);
+    }
 }

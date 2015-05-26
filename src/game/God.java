@@ -1,6 +1,8 @@
 package game;
 
-public class God {
+import java.io.Serializable;
+
+public class God implements Serializable {
 
 	private int popularity;
 	private String name = "God";
