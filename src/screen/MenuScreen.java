@@ -1,5 +1,7 @@
 package screen;
 
+import game.Instance;
+
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -116,30 +118,24 @@ public class MenuScreen extends Screen {
 			f_in = new 
 					FileInputStream("mymap.map");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-			// Read object using ObjectInputStream
-			ObjectInputStream obj_in = null;
-			try {
-				obj_in = new ObjectInputStream (f_in);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		ObjectInputStream obj_in = null;
+		try {
+			obj_in = new ObjectInputStream (f_in);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-			// Read an object
-			try {
-				GameScreen gameScreen = (GameScreen)obj_in.readObject();
-				Main.game.setScreen(gameScreen);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			GameScreen gameScreen = new GameScreen((Instance)obj_in.readObject());
+			Main.game.setScreen(gameScreen);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
