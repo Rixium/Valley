@@ -40,6 +40,7 @@ public class ResourceLoader {
 	public BufferedImage treegrowth;
 
 	public BufferedImage loadImage;
+	public BufferedImage saveImage;
 
 	public Clip menuMusic;
 	public Clip menuClick;
@@ -125,6 +126,7 @@ public class ResourceLoader {
 		menuMusic = loadClip("/menuSong.wav");
 		newGame = getBufferedImage("res/newGame.png");
 		loadGame = getBufferedImage("res/loadGame.png");
+		saveImage = getBufferedImage("res/saveImage.png");
 		quit = getBufferedImage("res/quit.png");
 		options = getBufferedImage("res/options.png");
 

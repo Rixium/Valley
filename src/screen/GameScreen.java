@@ -11,9 +11,12 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import main.Main;
+
 public class GameScreen extends Screen implements Serializable {
 	
 	private Instance instance;
+	private boolean savingGame;
 	
 	public GameScreen(String size, String treeGrowth, String godname) {
 		instance = new Instance(size, treeGrowth, godname, this);
@@ -24,11 +27,16 @@ public class GameScreen extends Screen implements Serializable {
 	}
 	
 	public void update() {
-		instance.update();
+		if(!savingGame) {
+			instance.update();
+		}
 	}
 	
 	public void paint(Graphics2D g) {
 		instance.paint(g);
+		if(savingGame) {
+			g.drawImage(Main.resourceLoader.saveImage, 0, 0, Main.GAME_WIDTH, Main.GAME_HEIGHT, null);
+		}
 	}
 
 	public Instance getInstance() {
@@ -39,6 +47,8 @@ public class GameScreen extends Screen implements Serializable {
 		instance.keyPressed(e);
 		
 		if(e.getKeyCode() == 123) {
+			savingGame = true;
+			this.paint((Graphics2D)Main.game.getGraphics());
 			FileOutputStream f_out = null;
 			ObjectOutputStream obj_out = null;
 			try {
@@ -59,7 +69,7 @@ public class GameScreen extends Screen implements Serializable {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			
+			savingGame = false;
 		}
 	}
 	

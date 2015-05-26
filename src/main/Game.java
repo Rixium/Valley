@@ -104,7 +104,7 @@ public class Game extends JPanel implements Runnable {
 			}
 			
 			try {
-                Thread.sleep(1);
+                Thread.sleep(5);
             } catch (InterruptedException e) {
             }
 			

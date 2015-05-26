@@ -234,6 +234,8 @@ public class Map implements Serializable {
 							&& entity.getPos().y > -renderY - tileSize
 									- entity.image.getHeight()) {
 						entity.update(renderX, renderY, this, cycle);
+					} else if (entity.entityName.equals("Person")) {
+						entity.update(renderX, renderY, this, cycle);
 					}
 
 					if (entity.getEntityName().equals("Tree") && thirstyTree == null) {
