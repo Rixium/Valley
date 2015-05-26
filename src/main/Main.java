@@ -25,6 +25,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		inputListener = new InputListener();
+		game.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 		frame.add(game);
 		frame.setTitle(title); // Set the title of JFrame.
 		frame.setFocusable(true);
@@ -33,10 +34,10 @@ public class Main {
 		frame.addKeyListener(inputListener);
 		frame.addMouseMotionListener(inputListener);
 		game.setFocusable(true);
-		game.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 		frame.pack(); // Correct the window size.
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit application on JFrame close.
 		frame.setLocationRelativeTo(null); // Make window appear in centre of screen.
 		frame.setVisible(true); // Set the window to visible.
+		frame.createBufferStrategy(3);
 	}
 }
