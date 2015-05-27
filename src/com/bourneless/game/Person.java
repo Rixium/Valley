@@ -13,6 +13,7 @@ import javax.swing.Timer;
 import com.bourneless.entity.Rock;
 import com.bourneless.entity.Stockpile;
 import com.bourneless.entity.Tree;
+import com.bourneless.entity.animation.Animation;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
 import com.bourneless.mechanics.Cycle;
@@ -80,6 +81,9 @@ public class Person extends Entity implements Serializable {
 	private boolean carryingStockpile;
 
 	private boolean atFire;
+	private boolean walking;
+	
+	private Animation walkAnimation;
 
 	private Timer waterTimer = new Timer(3000, new ActionListener() {
 		@Override
@@ -117,8 +121,8 @@ public class Person extends Entity implements Serializable {
 		this.entityName = "Person";
 		godName = god.getName();
 		this.name = setName();
-		
-		
+
+		walkAnimation = new Animation(Main.resourceLoader.walkingImages);
 		this.carryingStockpile = carryingStockpile;
 		this.cycle = cycle;
 
@@ -369,10 +373,14 @@ public class Person extends Entity implements Serializable {
 		}
 
 		if (length > 10 || length < -10) {
+			if(!walking) {
+				walkAnimation.start();
+				walking = true;
+			}
 			int stroke = random.nextInt(5);
-			if(stroke == 1 || !swimming) {
+			if (stroke == 1 || !swimming) {
 				if (pos.x > destinationPos.x) {
-						pos.x -= speed;
+					pos.x -= speed;
 				} else if (pos.x < destinationPos.x) {
 					pos.x += speed;
 				}
@@ -383,6 +391,9 @@ public class Person extends Entity implements Serializable {
 				}
 			}
 
+		} else if (length <= 10 && length >= - 10) {
+			walkAnimation.stop();
+			walking = false;
 		}
 
 		super.update(renderX, renderY, map, cycle);
@@ -391,13 +402,18 @@ public class Person extends Entity implements Serializable {
 
 	public void paint(Graphics2D g) {
 		if (!swimming) {
-			g.drawImage(Main.resourceLoader.heads[head], pos.x + renderX,
-					pos.y + renderY, null);
-			g.drawImage(
-					Main.resourceLoader.bodies[body],
-					pos.x + renderX,
-					pos.y + renderY
-							+ Main.resourceLoader.heads[head].getHeight(), null);
+			g.drawImage(Main.resourceLoader.heads[head], pos.x + renderX, pos.y
+					+ renderY, null);
+			if (!walking) {
+				g.drawImage(
+						Main.resourceLoader.bodies[body],
+						pos.x + renderX,
+						pos.y + renderY
+								+ Main.resourceLoader.heads[head].getHeight(),
+						null);
+			} else {
+				walkAnimation.paint(g, new Vector2(pos.x + renderX, pos.y + renderY + Main.resourceLoader.heads[head].getHeight()));
+			}
 		} else {
 			g.drawImage(Main.resourceLoader.swimming, pos.x + renderX, pos.y
 					+ renderY + 5, null);
@@ -691,7 +707,7 @@ public class Person extends Entity implements Serializable {
 	public boolean isCarrying() {
 		return this.carrying;
 	}
-	
+
 	private Object readResolve() throws ObjectStreamException {
 		Person person = this;
 		person.waterTimer.stop();
@@ -700,15 +716,16 @@ public class Person extends Entity implements Serializable {
 		person.miningTimer.restart();
 		person.isMining = false;
 		person.isWatering = false;
-		person.hasTree= false;
+		person.hasTree = false;
 		person.hasRock = false;
 		person.rock = null;
 		person.tree = null;
+		person.walking = false;
 		person.atDestination = false;
 		person.hasDestination = false;
 		person.gettingStamina = false;
 		person.role = Role.normal;
-		
+		person.walkAnimation = new Animation(Main.resourceLoader.walkingImages);
 		person.waterTimer = new Timer(3000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -724,7 +741,7 @@ public class Person extends Entity implements Serializable {
 				((Timer) e.getSource()).stop();
 			}
 		});
-		
+
 		person.miningTimer = new Timer(3000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -739,8 +756,8 @@ public class Person extends Entity implements Serializable {
 				((Timer) e.getSource()).stop();
 			}
 		});
-		
+
 		return person;
-    }
+	}
 
 }

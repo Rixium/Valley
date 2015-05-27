@@ -4,13 +4,14 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+
+import com.bourneless.entity.animation.Animation;
 
 public class ResourceLoader {
 
@@ -116,6 +117,13 @@ public class ResourceLoader {
 
 	// Mechanics
 	public BufferedImage lightsource;
+	
+	// Animation Images
+	public BufferedImage[] walkingImages = new BufferedImage[3];
+	
+	// Animations
+	
+	public Animation walkAnimation;
 
 	public ResourceLoader() {
 		splashImage = getBufferedImage("res/splash.png");
@@ -210,6 +218,12 @@ public class ResourceLoader {
 
 		cycle = getBufferedImage("res/night.png");
 		lightsource = getBufferedImage("res/mechanics/lightsource.png");
+		
+		walkingImages[0] = getBufferedImage("res/animations/walking/1.png");
+		walkingImages[1] = getBufferedImage("res/animations/walking/2.png");
+		walkingImages[2] = getBufferedImage("res/animations/walking/3.png");
+		
+		walkAnimation = new Animation(walkingImages);
 	}
 
 	public Clip loadClip(String filename) {
