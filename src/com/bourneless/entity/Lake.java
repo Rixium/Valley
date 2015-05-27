@@ -1,0 +1,33 @@
+package com.bourneless.entity;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.io.Serializable;
+
+import com.bourneless.game.Entity;
+import com.bourneless.game.Map;
+import com.bourneless.main.Main;
+import com.bourneless.math.Vector2;
+import com.bourneless.mechanics.Cycle;
+
+public class Lake extends Entity implements Serializable {
+
+	public Lake(Vector2 pos) {
+		System.out.println("Spawning Lake at: " + pos.x + " | " + pos.y + ".");
+		this.image = Main.resourceLoader.lake;
+		this.pos = pos;
+		this.rect = new Rectangle(pos.x, pos.y, image.getWidth(), image.getHeight());
+	}
+	
+	public void update(int renderX, int renderY, Map map, Cycle cycle) {
+		this.renderX = renderX;
+		this.renderY = renderY;
+		this.rect.x = pos.x + renderX;
+		this.rect.y = pos.y + renderY;
+	}
+	
+	public void paint(Graphics2D g) {
+		g.drawImage(image, pos.x + renderX, pos.y + renderY, null);
+	}
+}
