@@ -45,7 +45,7 @@ public class Tree extends Entity implements Serializable {
 		this.pos = tile.getPos();
 		this.rect = new Rectangle(pos.x, pos.y, 64,
 				64);
-		this.layer = (pos.y + 10) / map.getSize();
+		this.layer = (pos.y + 40) / map.getSize();
 	}
 
 	public void update(int renderX, int renderY, Map map, Cycle cycle) {

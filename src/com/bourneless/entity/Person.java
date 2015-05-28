@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.Timer;
@@ -70,8 +71,6 @@ public class Person extends Entity implements Serializable {
 
 	private boolean hasTree;
 	private boolean hasRock;
-
-	private boolean gettingStamina;
 
 	private Tile destinationTile;
 	private Tile currentTile;
@@ -508,7 +507,7 @@ public class Person extends Entity implements Serializable {
 	}
 
 	public void giveTree(Tree tree) {
-		if (!hasTree && !gettingStamina && !carrying) {
+		if (!hasTree && !needStamina && !carrying) {
 			hasDestination = true;
 			atDestination = false;
 			hasTree = true;
@@ -523,7 +522,7 @@ public class Person extends Entity implements Serializable {
 	}
 
 	public boolean isGettingStamina() {
-		return this.gettingStamina;
+		return this.needStamina;
 	}
 
 	public boolean isMining() {
@@ -542,13 +541,25 @@ public class Person extends Entity implements Serializable {
 		this.hasRock = hasRock;
 	}
 
-	public void giveRock(Rock rock) {
-		if (!hasRock && !gettingStamina && !carrying) {
+	public void giveRock(ArrayList<Rock> rock) {
+		Rock closestRock = rock.get(0);
+		for(Rock r : rock) {
+			if(!r.getDead()) {
+				double closestRockLength = Math.sqrt((closestRock.getPos().x - pos.x) * (closestRock.getPos().x - pos.x) + (closestRock.getPos().y - pos.y) * (closestRock.getPos().y - pos.y));
+				double newLength = Math.sqrt((r.getPos().x - pos.x) * (r.getPos().x - pos.x) + (r.getPos().y - pos.y) * (r.getPos().y - pos.y));
+				
+				if(newLength < closestRockLength && !r.getHasPerson() && !r.getDead()) {
+					closestRock = r;
+				}
+			}
+		}
+		if (!hasRock && !needStamina && !carrying && !closestRock.getDead()) {
 			hasDestination = true;
 			atDestination = false;
 			hasRock = true;
-			this.destinationPos = new Vector2(rock.getPos().x, rock.getPos().y);
-			this.rock = rock;
+			closestRock.setHasPerson(true);
+			this.destinationPos = new Vector2(closestRock.getPos().x, closestRock.getPos().y);
+			this.rock = closestRock;
 		}
 	}
 
@@ -595,7 +606,7 @@ public class Person extends Entity implements Serializable {
 		person.walking = false;
 		person.atDestination = false;
 		person.hasDestination = false;
-		person.gettingStamina = false;
+		person.needStamina = false;
 		person.role = Role.normal;
 		person.walkAnimation = new Animation(Main.resourceLoader.walkingImages,
 				100);
@@ -705,7 +716,7 @@ public class Person extends Entity implements Serializable {
 						}
 					}
 				}
-			} else if (carrying) {
+			} else if (carrying && map.getHasStockpile()) {
 				destinationPos = new Vector2(map.getStockpile().getPos().x, map
 						.getStockpile().getPos().y);
 				hasDestination = true;

@@ -68,6 +68,7 @@ public class ResourceLoader {
 
 	public BufferedImage cow;
 
+	public BufferedImage cycleImg;
 	public BufferedImage cycle;
 
 	public boolean menuMusicPlaying;
@@ -214,7 +215,7 @@ public class ResourceLoader {
 		rockMined = getBufferedImage("res/gameobjects/rockMined.png");
 		stockpile = getBufferedImage("res/gameobjects/stockpile.png");
 
-		cycle = getBufferedImage("res/night.png");
+		cycleImg = getBufferedImage("res/night.png");
 		lightsource = getBufferedImage("res/mechanics/lightsource.png");
 		
 		walkingImages[0] = getBufferedImage("res/animations/walking/1.png");
@@ -227,6 +228,9 @@ public class ResourceLoader {
 		
 		lakeImages[0] = getBufferedImage("res/animations/lake/1.png");
 		lakeImages[1] = getBufferedImage("res/animations/lake/2.png");
+		
+		cycle = new BufferedImage(cycleImg.getWidth(), cycleImg.getHeight(), BufferedImage.TYPE_INT_RGB);
+		cycle.getGraphics().drawImage(cycleImg,0,0, null);
 
 	}
 

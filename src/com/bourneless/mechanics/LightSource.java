@@ -51,6 +51,5 @@ public class LightSource implements Serializable {
 	public void setPos(Vector2 pos) {
 		this.pos = pos;
 	}
-	
 
 }

@@ -4,19 +4,14 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
-import com.bourneless.entity.Person;
-import com.bourneless.entity.animation.Animation;
-import com.bourneless.game.Role;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
 
@@ -28,6 +23,9 @@ public class Cycle implements Serializable {
 
 	private boolean isDay;
 	private boolean goDay = false;
+
+	private Raster r;
+	private int[] lightPixels;
 
 	Timer dayTimer = new Timer(1000, new ActionListener() {
 		@Override
@@ -68,17 +66,18 @@ public class Cycle implements Serializable {
 		this.pos = new Vector2(0, 0);
 		this.time = 0f;
 		dayTimer.start();
+		r = Main.resourceLoader.cycle.getRaster();
+		lightPixels = ((DataBufferInt) r.getDataBuffer()).getData();
 	}
 
 	public void update() {
-
 	}
 
 	public void paint(Graphics2D g) {
 		g.setComposite(AlphaComposite
 				.getInstance(AlphaComposite.SRC_OVER, time));
-		g.drawImage(Main.resourceLoader.cycle, pos.x, pos.y, Main.GAME_WIDTH * 2,
-				Main.GAME_HEIGHT * 2, null);
+		g.drawImage(Main.resourceLoader.cycle, pos.x, pos.y,
+				Main.GAME_WIDTH * 2, Main.GAME_HEIGHT * 2, null);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 	}
 
@@ -86,9 +85,13 @@ public class Cycle implements Serializable {
 		return isDay;
 	}
 	
+	public float getTime() {
+		return this.time;
+	}
+
 	private Object readResolve() throws ObjectStreamException {
 		Cycle cycle = this;
-		
+
 		this.dayTimer = new Timer(1000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -124,8 +127,8 @@ public class Cycle implements Serializable {
 			}
 		});
 		this.dayTimer.start();
-		
+
 		return cycle;
 	}
-	
+
 }

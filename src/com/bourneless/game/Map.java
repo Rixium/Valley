@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -26,6 +25,9 @@ public class Map implements Serializable {
 
 	private Tile[][] tiles;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
+	private ArrayList<Person> people = new ArrayList<Person>();
+	private ArrayList<Rock> rocks = new ArrayList<Rock>();
+	private ArrayList<Tree> trees = new ArrayList<Tree>();
 
 	private Random random = new Random();
 
@@ -53,9 +55,6 @@ public class Map implements Serializable {
 	private Entity lastEntity;
 	private Lake lake;
 	private int selectedTileRole = TileRoles.EMPTY;
-
-	private Rock rock;
-	private boolean gotRock;
 
 	private boolean canClick;
 
@@ -145,6 +144,7 @@ public class Map implements Serializable {
 						Tree tree = new Tree(tiles[i][j], this, isSapling);
 						tiles[i][j].setOccupied(true);
 						entities.add(tree);
+						trees.add(tree);
 					}
 				}
 			}
@@ -160,6 +160,7 @@ public class Map implements Serializable {
 					if (!tiles[i][j].isOccupied()) {
 						Rock rock = new Rock(tiles[i][j].getPos());
 						entities.add(rock);
+						rocks.add(rock);
 					}
 				}
 			}
@@ -173,7 +174,6 @@ public class Map implements Serializable {
 			this.god = god;
 			this.renderX = renderX;
 			this.renderY = renderY;
-
 			for (int i = 0; i < tiles.length; i++) {
 				for (int j = 0; j < tiles[i].length; j++) {
 					if (tiles[i][j].getPos().x < Main.GAME_WIDTH + -renderX
@@ -238,7 +238,8 @@ public class Map implements Serializable {
 						entity.update(renderX, renderY, this, cycle);
 					}
 
-					if (entity.getEntityName().equals("Tree") && thirstyTree == null) {
+					if (entity.getEntityName().equals("Tree")
+							&& thirstyTree == null) {
 						Tree tree = (Tree) entities.get(i);
 						if (tree.getThirst() >= 90 && tree.getIsSapling()
 								&& !tree.hasPerson()) {
@@ -278,48 +279,35 @@ public class Map implements Serializable {
 								if (!person.getHasRock()
 										&& !person.isCarrying()) {
 									if (cycle.getDay()) {
-										if (gotRock) {
-											person.giveRock(rock);
-											rock.setHasPerson(true);
-											rock = null;
-											gotRock = false;
-											System.out.println("Giving Rock");
-										}
+										person.giveRock(rocks);
 									}
 								}
 							}
 						}
-					} else if (entity.getEntityName().equals("Rock")) {
-						Rock tempRock = (Rock) entity;
-						if (!tempRock.getDead()
-								&& tempRock.getHasPerson() == false) {
-							rock = (Rock) entity;
-							gotRock = true;
-						}
 					}
 				}
+			}
 
-				if (hasFire == true) {
-					if (population < 5) {
-						int spawnPerson;
+			if (hasFire) {
+				if (population < 5) {
+					int spawnPerson;
 
-						if (population >= 1) {
-							spawnPerson = random.nextInt(population * 100000
-									/ god.getPopularity());
-						} else {
-							spawnPerson = random.nextInt(100000 / god
-									.getPopularity());
-						}
+					if (population >= 1) {
+						spawnPerson = random.nextInt(population * 10000
+								/ god.getPopularity());
+					} else {
+						spawnPerson = 1;
+					}
 
-						if (spawnPerson == 1) {
-							System.out.println("Spawning Person..");
+					if (spawnPerson == 1 && cycle.getDay()) {
+						System.out.println("Spawning Person..");
 
-							population++;
-							Person person = new Person(fire, this, god,
-									giveStockpile, cycle);
-							giveStockpile = false;
-							entities.add(person);
-						}
+						population++;
+						Person person = new Person(fire, this, god,
+								giveStockpile, cycle);
+						giveStockpile = false;
+						entities.add(person);
+						people.add(person);
 					}
 				}
 			}
@@ -334,7 +322,7 @@ public class Map implements Serializable {
 						&& tiles[i][j].getPos().y < Main.GAME_HEIGHT + -renderY
 						&& tiles[i][j].getPos().x > -renderX - tileSize
 						&& tiles[i][j].getPos().y > -renderY - tileSize) {
-					tiles[i][j].paint(g);
+					tiles[i][j].paint(g, lightSources);
 				}
 			}
 		}
@@ -363,7 +351,6 @@ public class Map implements Serializable {
 				}
 			}
 		}
-
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -520,5 +507,13 @@ public class Map implements Serializable {
 
 	public Cycle getCycle() {
 		return this.cycle;
+	}
+
+	public int getYOffset() {
+		return this.renderY;
+	}
+
+	public int getXOffset() {
+		return this.renderX;
 	}
 }

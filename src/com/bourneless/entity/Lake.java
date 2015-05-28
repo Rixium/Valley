@@ -34,8 +34,6 @@ public class Lake extends Entity implements Serializable {
 	}
 	
 	public void paint(Graphics2D g) {
-		g.setColor(Color.RED);
-		g.drawRect(rect.x, rect.y, rect.width, rect.height);
 		animation.paint(g, new Vector2(pos.x + renderX, pos.y + renderY));
 	}
 }
