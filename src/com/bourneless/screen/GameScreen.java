@@ -14,7 +14,6 @@ import com.bourneless.main.Main;
 
 public class GameScreen extends Screen implements Serializable {
 	
-	private Instance instance;
 	private boolean savingGame;
 	
 	public GameScreen(String size, String treeGrowth, String godname) {

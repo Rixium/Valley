@@ -1,5 +1,6 @@
 package com.bourneless.main;
 
+import java.applet.Applet;
 import java.awt.Dimension;
 import java.io.Serializable;
 

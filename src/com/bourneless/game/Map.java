@@ -11,6 +11,7 @@ import java.util.Random;
 
 import com.bourneless.entity.Cow;
 import com.bourneless.entity.Lake;
+import com.bourneless.entity.Person;
 import com.bourneless.entity.Rock;
 import com.bourneless.entity.Stockpile;
 import com.bourneless.entity.Tree;

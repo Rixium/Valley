@@ -366,4 +366,8 @@ public class Instance implements Serializable {
 	public Map getMap() {
 		return this.map;
 	}
+	
+	public Cycle getCycle() {
+		return this.cycle;
+	}
 }

@@ -16,6 +16,7 @@ public class Animation implements Serializable {
 	private boolean play;
 
 	private int activeImage = 0;
+	private int speed;
 
 	private Timer animationTimer = new Timer(100, new ActionListener() {
 		@Override
@@ -28,8 +29,10 @@ public class Animation implements Serializable {
 		}
 	});
 
-	public Animation(BufferedImage[] images) {
+	public Animation(BufferedImage[] images, int speed) {
 		this.images = images;
+		animationTimer.setDelay(speed);
+		this.speed = speed;
 	}
 
 	public void paint(Graphics2D g, Vector2 pos) {

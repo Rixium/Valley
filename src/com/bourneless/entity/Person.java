@@ -1,4 +1,4 @@
-package com.bourneless.game;
+package com.bourneless.entity;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -10,10 +10,13 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
-import com.bourneless.entity.Rock;
-import com.bourneless.entity.Stockpile;
-import com.bourneless.entity.Tree;
 import com.bourneless.entity.animation.Animation;
+import com.bourneless.game.Entity;
+import com.bourneless.game.God;
+import com.bourneless.game.Item;
+import com.bourneless.game.Map;
+import com.bourneless.game.Role;
+import com.bourneless.game.Tile;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
 import com.bourneless.mechanics.Cycle;
@@ -60,6 +63,7 @@ public class Person extends Entity implements Serializable {
 	private Random random = new Random();
 
 	private double fireDistance;
+	private double length;
 
 	private Tree tree;
 	private Rock rock;
@@ -82,8 +86,10 @@ public class Person extends Entity implements Serializable {
 
 	private boolean atFire;
 	private boolean walking;
-	
+	private boolean needStamina;
+
 	private Animation walkAnimation;
+	private boolean gotNightDestination;
 
 	private Timer waterTimer = new Timer(3000, new ActionListener() {
 		@Override
@@ -122,7 +128,7 @@ public class Person extends Entity implements Serializable {
 		godName = god.getName();
 		this.name = setName();
 
-		walkAnimation = new Animation(Main.resourceLoader.walkingImages);
+		walkAnimation = new Animation(Main.resourceLoader.walkingImages, 100);
 		this.carryingStockpile = carryingStockpile;
 		this.cycle = cycle;
 
@@ -179,192 +185,56 @@ public class Person extends Entity implements Serializable {
 
 	public void update(int renderX, int renderY, Map map, Cycle cycle) {
 
-		this.map = map;
-
-		if (this.cycle.getDay()) {
-			if (!hasDestination && stamina > 5 && !carryingStockpile
-					&& !carrying) {
-				if (!hasTree && !hasRock) {
-
-					int getDestination = random.nextInt(500);
-					if (getDestination == 1) {
-						int destinationX = random.nextInt(200);
-						int destinationY = random.nextInt(200);
-						destinationX -= 100;
-						destinationY -= 100;
-
-						if (pos.x + destinationX > 0) {
-							if (pos.x + destinationX < map.getSize()
-									* map.getTileSize()) {
-								if (pos.y + destinationY > 0) {
-									if (pos.y + destinationY < map.getSize()
-											* map.getTileSize()) {
-										destinationPos.x = pos.x + destinationX;
-										destinationPos.y = pos.y + destinationY;
-
-										hasDestination = true;
-									}
-								}
-							}
-						}
-					}
-				}
-			} else if (carrying) {
-				destinationPos = new Vector2(map.getStockpile().getPos().x, map
-						.getStockpile().getPos().y);
-				hasDestination = true;
-				atDestination = false;
-			}
-		}
-
 		this.renderX = renderX;
 		this.renderY = renderY;
+		this.rect.x = pos.x + renderX;
+		this.rect.y = pos.y + renderY;
+
+		this.map = map;
+
+		dayWalk();
 
 		fireDistance = Math.sqrt((firePos.x - pos.x) * (firePos.x - pos.x)
 				+ (firePos.y - pos.y) * (firePos.y - pos.y));
 
-		if (fireDistance <= 10) {
-			if (stamina < 100) {
-				stamina++;
-			}
-			atFire = true;
+		if (fireDistance <= 50) {
+			addStamina();
 		}
 
-		if (fireDistance <= 10 && stamina < 100 && gettingStamina) {
-
-			if (carryingStockpile) {
+		if (carryingStockpile) {
+			returnToFire();
+			if (fireDistance <= 50) {
 				map.dropStockpile(pos);
 				carryingStockpile = false;
 			}
-
-			if (stamina < 100) {
-				int addStamina = random.nextInt(10);
-				if (addStamina == 1) {
-					stamina += 1;
-				}
-			}
-		} else if (stamina > 0) {
-			int loseStamina = random.nextInt(100);
-			if (loseStamina == 1) {
-				if (!carrying) {
-					this.stamina--;
-				} else {
-					this.stamina -= 2;
-				}
-			}
+		}
+		
+		if(stamina <= 5) {
+			needStamina = true;
 		}
 
-		if (stamina < 0) {
-			stamina = 0;
-		}
+		removeStamina();
 
-		if (gettingStamina) {
-			if (stamina >= 100) {
-				gettingStamina = false;
-				atDestination = false;
-				hasDestination = false;
-			}
-		}
-
-		if (stamina <= 5 && !atFire || !cycle.getDay() && !atFire) {
-			this.waterTimer.stop();
-			this.miningTimer.stop();
-			this.isMining = false;
-			this.isWatering = false;
-			hasTree = false;
-			hasRock = false;
-			rock = null;
-			tree = null;
-			gettingStamina = true;
-			if (!hasDestination) {
-				destinationPos = firePos;
-				if (!carryingStockpile) {
-					int distanceFireX = random.nextInt(100);
-					distanceFireX -= 50;
-
-					int distanceFireY = random.nextInt(100);
-					distanceFireY -= 50;
-					destinationPos.x += distanceFireX;
-					destinationPos.y += distanceFireY;
-				} else {
-					destinationPos.x += 40;
-				}
-				hasDestination = true;
-			}
-		}
-
-		this.rect.x = pos.x + renderX;
-		this.rect.y = pos.y + renderY;
-
-		int getThought = random.nextInt(1000);
-		if (getThought == 1) {
-			int currentThought = random.nextInt(10);
-			switch (currentThought) {
-			case 0:
-				myThought = "I think " + godName + " is great.";
-				break;
-			case 1:
-				myThought = "I want to cut trees..";
-				break;
-			case 2:
-				myThought = "I need to pee..";
-				break;
-			case 3:
-				myThought = "I need to partake in some banter.";
-				break;
-			case 4:
-				myThought = "Should I leave the closet?";
-				break;
-			case 5:
-				myThought = "Thoughts are tedious work..";
-				break;
-			case 6:
-				myThought = "I want to play Video Games.";
-				break;
-			case 7:
-				myThought = "Perhaps we should build stuff.";
-				break;
-			case 8:
-				myThought = "I'm thinking about becoming a " + godName + "ist";
-				break;
-			case 9:
-				myThought = godName + "ism is really popular.";
-				break;
-			default:
-				myThought = "Thoughts are tedious work..";
-				break;
-			}
-		}
+		returnToFire();
+		createThought();
 
 		float directionX = destinationPos.x - pos.x;
 		float directionY = destinationPos.y - pos.y;
 
-		double length = Math.sqrt(directionX * directionX + directionY
-				* directionY);
+		length = Math.sqrt(directionX * directionX + directionY * directionY);
 
 		directionX /= length;
 		directionY /= length;
 
-		if (!gettingStamina) {
-			if (hasTree) {
-				if (length <= 10 && length >= -10) {
-					isWatering = true;
-
-					waterTimer.start();
-				}
-			}
-			if (hasRock) {
-				if (length <= 10 && length >= -10) {
-					isMining = true;
-					miningTimer.start();
-				}
-			}
+		if (role == Role.farmer) {
+			waterTree();
+		} else if (role == Role.miner) {
+			mineRock();
 		}
+
 		if (length <= 10 && length >= -10) {
 			atDestination = true;
-			if (gettingStamina == false) {
-				hasDestination = false;
-			}
+			hasDestination = false;
 			if (carrying) {
 				if (map.getHasStockpile()) {
 					clearInventory();
@@ -373,7 +243,7 @@ public class Person extends Entity implements Serializable {
 		}
 
 		if (length > 10 || length < -10) {
-			if(!walking) {
+			if (!walking) {
 				walkAnimation.start();
 				walking = true;
 			}
@@ -391,7 +261,7 @@ public class Person extends Entity implements Serializable {
 				}
 			}
 
-		} else if (length <= 10 && length >= - 10) {
+		} else if (length <= 10 && length >= -10) {
 			walkAnimation.stop();
 			walking = false;
 		}
@@ -412,7 +282,9 @@ public class Person extends Entity implements Serializable {
 								+ Main.resourceLoader.heads[head].getHeight(),
 						null);
 			} else {
-				walkAnimation.paint(g, new Vector2(pos.x + renderX, pos.y + renderY + Main.resourceLoader.heads[head].getHeight()));
+				walkAnimation.paint(g,
+						new Vector2(pos.x + renderX, pos.y + renderY
+								+ Main.resourceLoader.heads[head].getHeight()));
 			}
 		} else {
 			g.drawImage(Main.resourceLoader.swimming, pos.x + renderX, pos.y
@@ -725,7 +597,8 @@ public class Person extends Entity implements Serializable {
 		person.hasDestination = false;
 		person.gettingStamina = false;
 		person.role = Role.normal;
-		person.walkAnimation = new Animation(Main.resourceLoader.walkingImages);
+		person.walkAnimation = new Animation(Main.resourceLoader.walkingImages,
+				100);
 		person.waterTimer = new Timer(3000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -760,4 +633,157 @@ public class Person extends Entity implements Serializable {
 		return person;
 	}
 
+	public void createThought() {
+		int getThought = random.nextInt(1000);
+		if (getThought == 1) {
+			int currentThought = random.nextInt(10);
+			switch (currentThought) {
+			case 0:
+				myThought = "I think " + godName + " is great.";
+				break;
+			case 1:
+				myThought = "I want to cut trees..";
+				break;
+			case 2:
+				myThought = "I need to pee..";
+				break;
+			case 3:
+				myThought = "I need to partake in some banter.";
+				break;
+			case 4:
+				myThought = "Should I leave the closet?";
+				break;
+			case 5:
+				myThought = "Thoughts are tedious work..";
+				break;
+			case 6:
+				myThought = "I want to play Video Games.";
+				break;
+			case 7:
+				myThought = "Perhaps we should build stuff.";
+				break;
+			case 8:
+				myThought = "I'm thinking about becoming a " + godName + "ist";
+				break;
+			case 9:
+				myThought = godName + "ism is really popular.";
+				break;
+			default:
+				myThought = "Thoughts are tedious work..";
+				break;
+			}
+		}
+	}
+
+	public void dayWalk() {
+		if (this.cycle.getDay()) {
+			gotNightDestination = false;
+			if (!hasDestination && stamina > 5 && !carryingStockpile
+					&& !carrying) {
+				if (!hasTree && !hasRock) {
+
+					int getDestination = random.nextInt(300);
+					if (getDestination == 1) {
+						int destinationX = random.nextInt(200);
+						int destinationY = random.nextInt(200);
+						destinationX -= 100;
+						destinationY -= 100;
+
+						if (pos.x + destinationX > 0) {
+							if (pos.x + destinationX < map.getSize()
+									* map.getTileSize()) {
+								if (pos.y + destinationY > 0) {
+									if (pos.y + destinationY < map.getSize()
+											* map.getTileSize()) {
+										destinationPos.x = pos.x + destinationX;
+										destinationPos.y = pos.y + destinationY;
+
+										hasDestination = true;
+									}
+								}
+							}
+						}
+					}
+				}
+			} else if (carrying) {
+				destinationPos = new Vector2(map.getStockpile().getPos().x, map
+						.getStockpile().getPos().y);
+				hasDestination = true;
+				atDestination = false;
+			}
+		}
+	}
+
+	public void addStamina() {
+		if (stamina < 100) {
+			stamina++;
+		} else {
+			needStamina = false;
+		}
+	}
+
+	public void removeStamina() {
+		if (fireDistance > 50) {
+			if (stamina > 0) {
+				int loseStamina = random.nextInt(100);
+				if (loseStamina == 1) {
+					if (carrying && stamina >= 2) {
+						this.stamina -= 2;
+					} else if (stamina >= 1) {
+						this.stamina--;
+					}
+				}
+			}
+		}
+	}
+
+	public void returnToFire() {
+		if (needStamina || !cycle.getDay() && !gotNightDestination) {
+			this.waterTimer.stop();
+			this.miningTimer.stop();
+			this.isMining = false;
+			this.isWatering = false;
+			hasTree = false;
+			hasRock = false;
+			rock = null;
+			tree = null;
+			atDestination = false;
+			hasDestination = false;
+			if (!hasDestination) {
+				destinationPos = new Vector2(firePos.x, firePos.y);
+				if (!carryingStockpile) {
+					int distanceFireX = random.nextInt(100);
+					distanceFireX -= 50;
+
+					int distanceFireY = random.nextInt(100);
+					distanceFireY -= 50;
+					destinationPos.x += distanceFireX;
+					destinationPos.y += distanceFireY;
+				} else {
+					destinationPos.x += 40;
+				}
+				hasDestination = true;
+				gotNightDestination = true;
+			}
+		}
+	}
+
+	public void mineRock() {
+		if (hasRock) {
+			if (length <= 10 && length >= -10) {
+				isMining = true;
+				miningTimer.start();
+			}
+		}
+	}
+
+	public void waterTree() {
+		if (hasTree) {
+			if (length <= 10 && length >= -10) {
+				isWatering = true;
+
+				waterTimer.start();
+			}
+		}
+	}
 }

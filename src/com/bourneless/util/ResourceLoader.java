@@ -120,10 +120,8 @@ public class ResourceLoader {
 	
 	// Animation Images
 	public BufferedImage[] walkingImages = new BufferedImage[3];
-	
-	// Animations
-	
-	public Animation walkAnimation;
+	public BufferedImage[] flameImages = new BufferedImage[3];
+	public BufferedImage[] lakeImages = new BufferedImage[2];
 
 	public ResourceLoader() {
 		splashImage = getBufferedImage("res/splash.png");
@@ -223,7 +221,13 @@ public class ResourceLoader {
 		walkingImages[1] = getBufferedImage("res/animations/walking/2.png");
 		walkingImages[2] = getBufferedImage("res/animations/walking/3.png");
 		
-		walkAnimation = new Animation(walkingImages);
+		flameImages[0] = getBufferedImage("res/animations/flame/1.png");
+		flameImages[1] = getBufferedImage("res/animations/flame/2.png");
+		flameImages[2] = getBufferedImage("res/animations/flame/3.png");
+		
+		lakeImages[0] = getBufferedImage("res/animations/lake/1.png");
+		lakeImages[1] = getBufferedImage("res/animations/lake/2.png");
+
 	}
 
 	public Clip loadClip(String filename) {

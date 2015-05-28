@@ -12,6 +12,7 @@ import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
+import com.bourneless.entity.Person;
 import com.bourneless.item.Fire;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;

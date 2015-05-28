@@ -8,11 +8,15 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
+import com.bourneless.entity.Person;
+import com.bourneless.entity.animation.Animation;
+import com.bourneless.game.Role;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
 
@@ -80,6 +84,48 @@ public class Cycle implements Serializable {
 
 	public boolean getDay() {
 		return isDay;
+	}
+	
+	private Object readResolve() throws ObjectStreamException {
+		Cycle cycle = this;
+		
+		this.dayTimer = new Timer(1000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (time >= .7f) {
+					isDay = false;
+				} else if (time <= .5f) {
+					isDay = true;
+				}
+
+				if (time >= .9f) {
+					goDay = true;
+				} else if (time == 0) {
+					goDay = false;
+				}
+
+				if (!goDay) {
+					if (time < .3) {
+						time += .005f;
+					} else {
+						time += .01f;
+					}
+				} else if (goDay) {
+					if (time > .6) {
+						time -= .005f;
+					} else {
+						if (time - .01f >= 0) {
+							time -= .01f;
+						} else {
+							time = 0;
+						}
+					}
+				}
+			}
+		});
+		this.dayTimer.start();
+		
+		return cycle;
 	}
 	
 }
