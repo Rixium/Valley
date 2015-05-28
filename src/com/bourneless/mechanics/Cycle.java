@@ -66,8 +66,6 @@ public class Cycle implements Serializable {
 		this.pos = new Vector2(0, 0);
 		this.time = 0f;
 		dayTimer.start();
-		r = Main.resourceLoader.cycle.getRaster();
-		lightPixels = ((DataBufferInt) r.getDataBuffer()).getData();
 	}
 
 	public void update() {

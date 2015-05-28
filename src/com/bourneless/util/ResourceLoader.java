@@ -3,15 +3,16 @@ package com.bourneless.util;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-
-import com.bourneless.entity.animation.Animation;
 
 public class ResourceLoader {
 
@@ -68,7 +69,6 @@ public class ResourceLoader {
 
 	public BufferedImage cow;
 
-	public BufferedImage cycleImg;
 	public BufferedImage cycle;
 
 	public boolean menuMusicPlaying;
@@ -93,9 +93,11 @@ public class ResourceLoader {
 
 	// Player objects
 
-	public BufferedImage[] heads = new BufferedImage[7];
-	public BufferedImage head1, head2, head3;
-	public BufferedImage[] bodies = new BufferedImage[5];
+	public BufferedImage[] maleHeads = new BufferedImage[7];
+	public BufferedImage[] maleBodies = new BufferedImage[5];
+	public BufferedImage[] femaleHeads = new BufferedImage[7];
+	public BufferedImage[] femaleBodies = new BufferedImage[5];
+	
 	public BufferedImage swimming;
 
 	// Stat icons
@@ -111,6 +113,7 @@ public class ResourceLoader {
 	// Voices
 
 	public Clip[] voices = new Clip[4];
+	public Clip[] femaleVoices = new Clip[4];
 
 	// Role objects
 	public BufferedImage wateringcan;
@@ -123,6 +126,10 @@ public class ResourceLoader {
 	public BufferedImage[] walkingImages = new BufferedImage[3];
 	public BufferedImage[] flameImages = new BufferedImage[3];
 	public BufferedImage[] lakeImages = new BufferedImage[2];
+	
+	// Text
+	public ArrayList<String> maleNames = new ArrayList<String>();
+	public ArrayList<String> femaleNames = new ArrayList<String>();
 
 	public ResourceLoader() {
 		splashImage = getBufferedImage("res/splash.png");
@@ -148,6 +155,10 @@ public class ResourceLoader {
 		voices[1] = loadClip("/voices/man2.wav");
 		voices[2] = loadClip("/voices/man3.wav");
 		voices[3] = loadClip("/voices/man4.wav");
+		femaleVoices[0] = loadClip("/voices/fem1.wav");
+		femaleVoices[1] = loadClip("/voices/fem2.wav");
+		femaleVoices[2] = loadClip("/voices/fem3.wav");
+		femaleVoices[3] = loadClip("/voices/fem4.wav");
 
 		tree = getBufferedImage("res/gameobjects/tree.png");
 		treeBottomCut = getBufferedImage("res/gameobjects/treebottomcut.png");
@@ -175,18 +186,32 @@ public class ResourceLoader {
 		mapcreation = getBufferedImage("res/mapCreationImage.png");
 
 		person = getBufferedImage("res/person.png");
-		heads[0] = getBufferedImage("res/playerobjects/head1.png");
-		heads[1] = getBufferedImage("res/playerobjects/head2.png");
-		heads[2] = getBufferedImage("res/playerobjects/head3.png");
-		heads[3] = getBufferedImage("res/playerobjects/head4.png");
-		heads[4] = getBufferedImage("res/playerobjects/head5.png");
-		heads[5] = getBufferedImage("res/playerobjects/head6.png");
-		heads[6] = getBufferedImage("res/playerobjects/head7.png");
-		bodies[0] = getBufferedImage("res/playerobjects/body1.png");
-		bodies[1] = getBufferedImage("res/playerobjects/body2.png");
-		bodies[2] = getBufferedImage("res/playerobjects/body3.png");
-		bodies[3] = getBufferedImage("res/playerobjects/body4.png");
-		bodies[4] = getBufferedImage("res/playerobjects/body5.png");
+		maleHeads[0] = getBufferedImage("res/playerobjects/head1.png");
+		maleHeads[1] = getBufferedImage("res/playerobjects/head2.png");
+		maleHeads[2] = getBufferedImage("res/playerobjects/head3.png");
+		maleHeads[3] = getBufferedImage("res/playerobjects/head4.png");
+		maleHeads[4] = getBufferedImage("res/playerobjects/head5.png");
+		maleHeads[5] = getBufferedImage("res/playerobjects/head6.png");
+		maleHeads[6] = getBufferedImage("res/playerobjects/head7.png");
+		maleBodies[0] = getBufferedImage("res/playerobjects/body1.png");
+		maleBodies[1] = getBufferedImage("res/playerobjects/body2.png");
+		maleBodies[2] = getBufferedImage("res/playerobjects/body3.png");
+		maleBodies[3] = getBufferedImage("res/playerobjects/body4.png");
+		maleBodies[4] = getBufferedImage("res/playerobjects/body5.png");
+		
+		femaleHeads[0] = getBufferedImage("res/playerobjects/fHead1.png");
+		femaleHeads[1] = getBufferedImage("res/playerobjects/fHead2.png");
+		femaleHeads[2] = getBufferedImage("res/playerobjects/fHead3.png");
+		femaleHeads[3] = getBufferedImage("res/playerobjects/fHead4.png");
+		femaleHeads[4] = getBufferedImage("res/playerobjects/fHead5.png");
+		femaleHeads[5] = getBufferedImage("res/playerobjects/fHead6.png");
+		femaleHeads[6] = getBufferedImage("res/playerobjects/fHead7.png");
+		
+		femaleBodies[0] = getBufferedImage("res/playerobjects/fBody1.png");
+		femaleBodies[1] = getBufferedImage("res/playerobjects/fBody2.png");
+		femaleBodies[2] = getBufferedImage("res/playerobjects/fBody3.png");
+		femaleBodies[3] = getBufferedImage("res/playerobjects/fBody4.png");
+		femaleBodies[4] = getBufferedImage("res/playerobjects/fBody5.png");
 
 		cooking = getBufferedImage("res/statIcons/cooking.png");
 		farming = getBufferedImage("res/statIcons/farming.png");
@@ -215,7 +240,7 @@ public class ResourceLoader {
 		rockMined = getBufferedImage("res/gameobjects/rockMined.png");
 		stockpile = getBufferedImage("res/gameobjects/stockpile.png");
 
-		cycleImg = getBufferedImage("res/night.png");
+		cycle = getBufferedImage("res/night.png");
 		lightsource = getBufferedImage("res/mechanics/lightsource.png");
 		
 		walkingImages[0] = getBufferedImage("res/animations/walking/1.png");
@@ -228,10 +253,30 @@ public class ResourceLoader {
 		
 		lakeImages[0] = getBufferedImage("res/animations/lake/1.png");
 		lakeImages[1] = getBufferedImage("res/animations/lake/2.png");
-		
-		cycle = new BufferedImage(cycleImg.getWidth(), cycleImg.getHeight(), BufferedImage.TYPE_INT_RGB);
-		cycle.getGraphics().drawImage(cycleImg,0,0, null);
 
+		Scanner s = null;
+		
+		try {
+			s = new Scanner(new File("res/text/maleNames.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		while (s.hasNextLine()) {
+			maleNames.add(s.nextLine());
+		}
+		s.close();
+		
+		try {
+			s = new Scanner(new File("res/text/femaleNames.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		while(s.hasNextLine()) {
+			femaleNames.add(s.nextLine());
+		}
+		s.close();
 	}
 
 	public Clip loadClip(String filename) {

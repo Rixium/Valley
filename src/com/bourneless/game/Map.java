@@ -379,12 +379,22 @@ public class Map implements Serializable {
 									selectedPerson.setSelected(false);
 									selectedPerson = currentPerson;
 									selectedPerson.setSelected(true);
-									int randomVoice = random
-											.nextInt(Main.resourceLoader.voices.length);
-									Main.resourceLoader
-											.playClip(
-													Main.resourceLoader.voices[randomVoice],
-													-5f, false);
+									if (selectedPerson.getMySex().matches(
+											"Male")) {
+										int randomVoice = random
+												.nextInt(Main.resourceLoader.voices.length);
+										Main.resourceLoader
+												.playClip(
+														Main.resourceLoader.voices[randomVoice],
+														-5f, false);
+									} else {
+										int randomVoice = random
+												.nextInt(Main.resourceLoader.femaleVoices.length);
+										Main.resourceLoader
+												.playClip(
+														Main.resourceLoader.femaleVoices[randomVoice],
+														-10f, false);
+									}
 								} else if (selectedPerson.getName() == currentPerson
 										.getName()) {
 									selectedPerson.setSelected(false);
@@ -394,12 +404,21 @@ public class Map implements Serializable {
 								System.out.println("selecting person");
 								selectedPerson = (Person) entities.get(i);
 								selectedPerson.setSelected(true);
-								int randomVoice = random
-										.nextInt(Main.resourceLoader.voices.length);
-								Main.resourceLoader
-										.playClip(
-												Main.resourceLoader.voices[randomVoice],
-												-5f, false);
+								if (selectedPerson.getMySex().matches("Male")) {
+									int randomVoice = random
+											.nextInt(Main.resourceLoader.voices.length);
+									Main.resourceLoader
+											.playClip(
+													Main.resourceLoader.voices[randomVoice],
+													-5f, false);
+								} else {
+									int randomVoice = random
+											.nextInt(Main.resourceLoader.femaleVoices.length);
+									Main.resourceLoader
+											.playClip(
+													Main.resourceLoader.femaleVoices[randomVoice],
+													-10f, false);
+								}
 							}
 						}
 					}

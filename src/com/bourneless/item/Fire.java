@@ -52,17 +52,19 @@ public class Fire extends Item implements Serializable {
 
 	public void paint(Graphics2D g) {
 		super.paint(g);
+		if (Main.game.getScreen().getInstance().getCycle() != null) {
+			if (!Main.game.getScreen().getInstance().getCycle().getDay()) {
+				if (!isAnimating) {
+					fireAnimation.start();
+					isAnimating = true;
+				}
+				fireAnimation.paint(g, new Vector2(pos.x + renderX, pos.y
+						+ renderY));
 
-		if (!Main.game.getScreen().getInstance().getCycle().getDay()) {
-			if (!isAnimating) {
-				fireAnimation.start();
-				isAnimating = true;
+			} else {
+				isAnimating = false;
+				fireAnimation.stop();
 			}
-			fireAnimation.paint(g, new Vector2(pos.x + renderX, pos.y + renderY));
-			
-		} else {
-			isAnimating = false;
-			fireAnimation.stop();
 		}
 	}
 

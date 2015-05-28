@@ -3,11 +3,17 @@ package com.bourneless.entity;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
+
+import javax.swing.Timer;
 
 import com.bourneless.entity.animation.Animation;
 import com.bourneless.game.Entity;
 import com.bourneless.game.Map;
+import com.bourneless.game.Role;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
 import com.bourneless.mechanics.Cycle;
@@ -35,5 +41,11 @@ public class Lake extends Entity implements Serializable {
 	
 	public void paint(Graphics2D g) {
 		animation.paint(g, new Vector2(pos.x + renderX, pos.y + renderY));
+	}
+	
+	private Object readResolve() throws ObjectStreamException {
+		Lake lake = this;
+		lake.animation = new Animation(Main.resourceLoader.lakeImages, 300);
+		return lake;
 	}
 }

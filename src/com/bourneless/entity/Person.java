@@ -59,6 +59,7 @@ public class Person extends Entity implements Serializable {
 
 	private String myThought = "Nothing.";
 	private String godName;
+	private String sex;
 
 	private Vector2 destinationPos;
 	private Random random = new Random();
@@ -125,6 +126,7 @@ public class Person extends Entity implements Serializable {
 			Cycle cycle) {
 		this.entityName = "Person";
 		godName = god.getName();
+		getSex();
 		this.name = setName();
 
 		walkAnimation = new Animation(Main.resourceLoader.walkingImages, 100);
@@ -133,9 +135,10 @@ public class Person extends Entity implements Serializable {
 
 		this.inventory = new Inventory();
 
-		head = random.nextInt(Main.resourceLoader.heads.length);
-
-		body = random.nextInt(Main.resourceLoader.bodies.length);
+		if (sex.matches("Male")) {
+			head = random.nextInt(Main.resourceLoader.maleHeads.length);
+			body = random.nextInt(Main.resourceLoader.maleBodies.length);
+		}
 
 		this.image = Main.resourceLoader.person;
 
@@ -207,8 +210,8 @@ public class Person extends Entity implements Serializable {
 				carryingStockpile = false;
 			}
 		}
-		
-		if(stamina <= 5) {
+
+		if (stamina <= 5) {
 			needStamina = true;
 		}
 
@@ -271,25 +274,52 @@ public class Person extends Entity implements Serializable {
 
 	public void paint(Graphics2D g) {
 		if (!swimming) {
-			g.drawImage(Main.resourceLoader.heads[head], pos.x + renderX, pos.y
-					+ renderY, null);
+			if (sex.matches("Male")) {
+				g.drawImage(Main.resourceLoader.maleHeads[head], pos.x
+						+ renderX, pos.y + renderY, null);
+			} else if (sex.matches("Female")) {
+				g.drawImage(Main.resourceLoader.femaleHeads[head], pos.x
+						+ renderX, pos.y + renderY, null);
+				}
 			if (!walking) {
-				g.drawImage(
-						Main.resourceLoader.bodies[body],
-						pos.x + renderX,
-						pos.y + renderY
-								+ Main.resourceLoader.heads[head].getHeight(),
-						null);
+				if (sex.matches("Male")) {
+					g.drawImage(Main.resourceLoader.maleBodies[body], pos.x
+							+ renderX, pos.y + renderY
+							+ Main.resourceLoader.maleHeads[head].getHeight(),
+							null);
+				} else if (sex.matches("Female")) {
+					g.drawImage(Main.resourceLoader.femaleBodies[body], pos.x
+							+ renderX, pos.y + renderY
+							+ Main.resourceLoader.femaleHeads[head].getHeight(),
+							null);
+					}
 			} else {
-				walkAnimation.paint(g,
-						new Vector2(pos.x + renderX, pos.y + renderY
-								+ Main.resourceLoader.heads[head].getHeight()));
+				if (sex.matches("Male")) {
+					walkAnimation.paint(
+							g,
+							new Vector2(pos.x + renderX, pos.y
+									+ renderY
+									+ Main.resourceLoader.maleHeads[head]
+											.getHeight()));
+				} else if (sex.matches("Female")) {
+					walkAnimation.paint(
+							g,
+							new Vector2(pos.x + renderX, pos.y
+									+ renderY
+									+ Main.resourceLoader.femaleHeads[head]
+											.getHeight()));
+				}
 			}
 		} else {
 			g.drawImage(Main.resourceLoader.swimming, pos.x + renderX, pos.y
 					+ renderY + 5, null);
-			g.drawImage(Main.resourceLoader.heads[head], pos.x + renderX, pos.y
-					+ renderY, null);
+			if (sex.matches("Male")) {
+				g.drawImage(Main.resourceLoader.maleHeads[head], pos.x
+						+ renderX, pos.y + renderY, null);
+			} else if (sex.matches("Female")) {
+				g.drawImage(Main.resourceLoader.femaleHeads[head], pos.x
+						+ renderX, pos.y + renderY, null);
+			}
 		}
 
 		if (isWatering) {
@@ -300,6 +330,15 @@ public class Person extends Entity implements Serializable {
 			g.drawImage(Main.resourceLoader.pickaxe,
 					pos.x + renderX + image.getWidth() - 6, pos.y + renderY
 							+ image.getHeight() / 2 + 5, null);
+		}
+	}
+
+	public void getSex() {
+		int s = random.nextInt(2);
+		if (s == 0) {
+			sex = "Female";
+		} else {
+			sex = "Male";
 		}
 	}
 
@@ -408,82 +447,15 @@ public class Person extends Entity implements Serializable {
 	}
 
 	public String setName() {
-		int num = random.nextInt(23);
-		String name;
-
-		switch (num) {
-		case 0:
-			name = "Derek";
-			break;
-		case 1:
-			name = "Barney";
-			break;
-		case 2:
-			name = "Gabe";
-			break;
-		case 3:
-			name = "Damien";
-			break;
-		case 4:
-			name = "Richard";
-			break;
-		case 5:
-			name = "Mathias";
-			break;
-		case 6:
-			name = "Daniel";
-			break;
-		case 7:
-			name = "John";
-			break;
-		case 8:
-			name = "Alex";
-			break;
-		case 9:
-			name = "Andrew";
-			break;
-		case 10:
-			name = "Callum";
-			break;
-		case 11:
-			name = "David";
-			break;
-		case 12:
-			name = "George";
-			break;
-		case 13:
-			name = "Rhys";
-			break;
-		case 14:
-			name = "Robert";
-			break;
-		case 15:
-			name = "Nathan";
-			break;
-		case 16:
-			name = "Jake";
-			break;
-		case 18:
-			name = "Dexter";
-			break;
-		case 19:
-			name = "Ned";
-			break;
-		case 20:
-			name = "Jaime";
-			break;
-		case 21:
-			name = "Kieran";
-			break;
-		case 22:
-			name = "Hugo";
-			break;
-		default:
-			name = "Steven";
-			break;
+		String s;
+		if (sex.matches("Male")) {
+			int num = random.nextInt(Main.resourceLoader.maleNames.size());
+			s = Main.resourceLoader.maleNames.get(num);
+		} else {
+			int num = random.nextInt(Main.resourceLoader.femaleNames.size());
+			s = Main.resourceLoader.femaleNames.get(num);
 		}
-
-		return name;
+		return s;
 	}
 
 	public String getThought() {
@@ -543,12 +515,19 @@ public class Person extends Entity implements Serializable {
 
 	public void giveRock(ArrayList<Rock> rock) {
 		Rock closestRock = rock.get(0);
-		for(Rock r : rock) {
-			if(!r.getDead()) {
-				double closestRockLength = Math.sqrt((closestRock.getPos().x - pos.x) * (closestRock.getPos().x - pos.x) + (closestRock.getPos().y - pos.y) * (closestRock.getPos().y - pos.y));
-				double newLength = Math.sqrt((r.getPos().x - pos.x) * (r.getPos().x - pos.x) + (r.getPos().y - pos.y) * (r.getPos().y - pos.y));
-				
-				if(newLength < closestRockLength && !r.getHasPerson() && !r.getDead()) {
+		for (Rock r : rock) {
+			if (!r.getDead()) {
+				double closestRockLength = Math
+						.sqrt((closestRock.getPos().x - pos.x)
+								* (closestRock.getPos().x - pos.x)
+								+ (closestRock.getPos().y - pos.y)
+								* (closestRock.getPos().y - pos.y));
+				double newLength = Math.sqrt((r.getPos().x - pos.x)
+						* (r.getPos().x - pos.x) + (r.getPos().y - pos.y)
+						* (r.getPos().y - pos.y));
+
+				if (newLength < closestRockLength && !r.getHasPerson()
+						&& !r.getDead()) {
 					closestRock = r;
 				}
 			}
@@ -558,7 +537,8 @@ public class Person extends Entity implements Serializable {
 			atDestination = false;
 			hasRock = true;
 			closestRock.setHasPerson(true);
-			this.destinationPos = new Vector2(closestRock.getPos().x, closestRock.getPos().y);
+			this.destinationPos = new Vector2(closestRock.getPos().x,
+					closestRock.getPos().y);
 			this.rock = closestRock;
 		}
 	}
@@ -796,5 +776,9 @@ public class Person extends Entity implements Serializable {
 				waterTimer.start();
 			}
 		}
+	}
+	
+	public String getMySex() {
+		return this.sex;
 	}
 }
