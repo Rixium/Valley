@@ -28,6 +28,7 @@ public class Tree extends Entity implements Serializable {
 	private Random random = new Random();
 	private boolean hasPerson = false;
 	private boolean cut = false;
+	private boolean aged = false;
 
 	public Tree(Tile tile, Map map, boolean isSapling) {
 		this.entityName = "Tree";
@@ -45,7 +46,7 @@ public class Tree extends Entity implements Serializable {
 		this.pos = tile.getPos();
 		this.rect = new Rectangle(pos.x, pos.y, 64,
 				64);
-		this.layer = (pos.y + 40) / map.getSize();
+		this.layer = (pos.y + 50) / map.getSize();
 	}
 
 	public void update(int renderX, int renderY, Map map, Cycle cycle) {
@@ -61,12 +62,15 @@ public class Tree extends Entity implements Serializable {
 				}
 			}
 			if (age >= 10) {
-				thirst = 0;
-				isSapling = false;
-				hasPerson = false;
-				canCut = true;
-				this.pos = tile.getPos();
-				this.layer = (pos.y + 10) / map.getSize();
+				if(!aged) {
+					thirst = 0;
+					isSapling = false;
+					hasPerson = false;
+					canCut = true;
+					this.pos = tile.getPos();
+					this.layer = (pos.y + 50) / map.getSize();
+					aged = true;
+				}
 			} else {
 				int addThirst = random.nextInt(1000);
 				if (addThirst == 1) {
@@ -105,7 +109,7 @@ public class Tree extends Entity implements Serializable {
 	}
 
 	public boolean getCut() {
-		return this.canCut;
+		return this.cut;
 	}
 
 	public int getThirst() {
@@ -125,6 +129,12 @@ public class Tree extends Entity implements Serializable {
 			setSapling(false);
 			setHasPerson(false);
 		}
+	}
+	
+	public void cut() {
+		this.hasPerson = false;
+		this.cut = true;
+		this.canCut = false;
 	}
 
 	public boolean hasPerson() {

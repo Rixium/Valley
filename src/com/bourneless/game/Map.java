@@ -238,14 +238,7 @@ public class Map implements Serializable {
 						entity.update(renderX, renderY, this, cycle);
 					}
 
-					if (entity.getEntityName().equals("Tree")
-							&& thirstyTree == null) {
-						Tree tree = (Tree) entities.get(i);
-						if (tree.getThirst() >= 90 && tree.getIsSapling()
-								&& !tree.hasPerson()) {
-							thirstyTree = tree;
-						}
-					} else if (entity.getEntityName().equals("Person")) {
+					if (entity.getEntityName().equals("Person")) {
 						Person person = (Person) entities.get(i);
 						if (lake.getRect().contains(person.getRect())) {
 							person.setSwimming(true);
@@ -253,23 +246,13 @@ public class Map implements Serializable {
 							person.setSwimming(false);
 						}
 
-						if (person.getRole() == Role.farmer) {
-							if (thirstyTree != null) {
-								if (person.getStamina() > 5
-										&& !person.isGettingStamina()) {
-									if (!person.hasTree()) {
-										if (cycle.getDay()) {
-											if (thirstyTree.getIsSapling()) {
-												if (!thirstyTree.hasPerson()) {
-													thirstyTree
-															.setHasPerson(true);
-													person.giveTree(thirstyTree);
-													thirstyTree = null;
-												}
-											} else {
-												thirstyTree = null;
-											}
-										}
+						if (person.getRole() == Role.farmer
+								|| person.getRole() == Role.woodcutter) {
+							if (person.getStamina() > 5
+									&& !person.isGettingStamina()) {
+								if (!person.hasTree()) {
+									if (cycle.getDay()) {
+										person.giveTree(trees);
 									}
 								}
 							}

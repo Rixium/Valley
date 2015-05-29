@@ -78,6 +78,7 @@ public class Person extends Entity implements Serializable {
 
 	private boolean isWatering = false;
 	private boolean isMining = false;
+	private boolean isCutting = false;
 
 	private Inventory inventory;
 
@@ -99,7 +100,6 @@ public class Person extends Entity implements Serializable {
 			isWatering = false;
 			destinationPos = firePos;
 			tree.water();
-			inventory.addWood(2);
 			carrying = true;
 			stamina -= 10;
 			tree = null;
@@ -122,6 +122,21 @@ public class Person extends Entity implements Serializable {
 		}
 	});
 
+	private Timer cutTimer = new Timer(3000, new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			hasTree = false;
+			isCutting = false;
+			destinationPos = firePos;
+			tree.cut();
+			inventory.addWood(2);
+			carrying = true;
+			stamina -= 10;
+			tree = null;
+			((Timer) e.getSource()).stop();
+		}
+	});
+
 	public Person(Item fire, Map map, God god, boolean carryingStockpile,
 			Cycle cycle) {
 		this.entityName = "Person";
@@ -138,6 +153,9 @@ public class Person extends Entity implements Serializable {
 		if (sex.matches("Male")) {
 			head = random.nextInt(Main.resourceLoader.maleHeads.length);
 			body = random.nextInt(Main.resourceLoader.maleBodies.length);
+		} else if (sex.matches("Female")) {
+			head = random.nextInt(Main.resourceLoader.femaleHeads.length);
+			body = random.nextInt(Main.resourceLoader.femaleBodies.length);
 		}
 
 		this.image = Main.resourceLoader.person;
@@ -232,6 +250,8 @@ public class Person extends Entity implements Serializable {
 			waterTree();
 		} else if (role == Role.miner) {
 			mineRock();
+		} else if (role == Role.woodcutter) {
+			cutTree();
 		}
 
 		if (length <= 10 && length >= -10) {
@@ -280,7 +300,7 @@ public class Person extends Entity implements Serializable {
 			} else if (sex.matches("Female")) {
 				g.drawImage(Main.resourceLoader.femaleHeads[head], pos.x
 						+ renderX, pos.y + renderY, null);
-				}
+			}
 			if (!walking) {
 				if (sex.matches("Male")) {
 					g.drawImage(Main.resourceLoader.maleBodies[body], pos.x
@@ -288,11 +308,14 @@ public class Person extends Entity implements Serializable {
 							+ Main.resourceLoader.maleHeads[head].getHeight(),
 							null);
 				} else if (sex.matches("Female")) {
-					g.drawImage(Main.resourceLoader.femaleBodies[body], pos.x
-							+ renderX, pos.y + renderY
-							+ Main.resourceLoader.femaleHeads[head].getHeight(),
-							null);
-					}
+					g.drawImage(
+							Main.resourceLoader.femaleBodies[body],
+							pos.x + renderX,
+							pos.y
+									+ renderY
+									+ Main.resourceLoader.femaleHeads[head]
+											.getHeight(), null);
+				}
 			} else {
 				if (sex.matches("Male")) {
 					walkAnimation.paint(
@@ -478,13 +501,31 @@ public class Person extends Entity implements Serializable {
 		this.swimming = bool;
 	}
 
-	public void giveTree(Tree tree) {
-		if (!hasTree && !needStamina && !carrying) {
+	public void giveTree(ArrayList<Tree> tree) {
+		Tree closestTree = tree.get(0);
+		for (Tree t : tree) {
+			double closestTreeLength = Math
+					.sqrt((closestTree.getPos().x - pos.x)
+							* (closestTree.getPos().x - pos.x)
+							+ (closestTree.getPos().y - pos.y)
+							* (closestTree.getPos().y - pos.y));
+			double newLength = Math.sqrt((t.getPos().x - pos.x)
+					* (t.getPos().x - pos.x) + (t.getPos().y - pos.y)
+					* (t.getPos().y - pos.y));
+
+			if (newLength < closestTreeLength && !t.hasPerson() && !t.getCut()
+					&& !t.getIsSapling()) {
+				closestTree = t;
+			}
+		}
+		if (!hasTree && !needStamina && !carrying && !closestTree.getCut()
+				&& !closestTree.getIsSapling() && !closestTree.hasPerson()) {
+			closestTree.setHasPerson(true);
 			hasDestination = true;
 			atDestination = false;
 			hasTree = true;
-			this.destinationPos = tree.getPos();
-			this.tree = tree;
+			this.destinationPos = closestTree.getPos();
+			this.tree = closestTree;
 		}
 
 	}
@@ -575,6 +616,8 @@ public class Person extends Entity implements Serializable {
 		Person person = this;
 		person.waterTimer.stop();
 		person.miningTimer.stop();
+		person.cutTimer.stop();
+		person.cutTimer.restart();
 		person.waterTimer.restart();
 		person.miningTimer.restart();
 		person.isMining = false;
@@ -598,6 +641,21 @@ public class Person extends Entity implements Serializable {
 				isWatering = false;
 				destinationPos = firePos;
 				tree.water();
+				inventory.addWood(2);
+				carrying = true;
+				stamina -= 10;
+				tree = null;
+				((Timer) e.getSource()).stop();
+			}
+		});
+
+		person.cutTimer = new Timer(3000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hasTree = false;
+				isCutting = false;
+				destinationPos = firePos;
+				tree.cut();
 				inventory.addWood(2);
 				carrying = true;
 				stamina -= 10;
@@ -768,6 +826,15 @@ public class Person extends Entity implements Serializable {
 		}
 	}
 
+	public void cutTree() {
+		if (hasTree) {
+			if (length <= 10 && length >= -10) {
+				isCutting = true;
+				cutTimer.start();
+			}
+		}
+	}
+
 	public void waterTree() {
 		if (hasTree) {
 			if (length <= 10 && length >= -10) {
@@ -777,7 +844,7 @@ public class Person extends Entity implements Serializable {
 			}
 		}
 	}
-	
+
 	public String getMySex() {
 		return this.sex;
 	}
