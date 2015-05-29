@@ -97,7 +97,7 @@ public class UI implements Serializable {
 					Main.resourceLoader.personStatScreen.getHeight() * 2, null);
 			g.setColor(Color.WHITE);
 
-			g.drawString("Name: " + selectedPerson.getName(), 100,
+			g.drawString("Name: " + selectedPerson.getName() + " " + selectedPerson.getTitle(), 100,
 					Main.GAME_HEIGHT / 2 - Main.resourceLoader.personStatScreen.getHeight()
 							+ 70);
 			g.drawString("Health: " + selectedPerson.getHealth(), 100,

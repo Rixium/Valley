@@ -362,7 +362,7 @@ public class Map implements Serializable {
 									selectedPerson = currentPerson;
 									selectedPerson.setSelected(true);
 									if (selectedPerson.getMySex().matches(
-											"Male")) {
+											"Man")) {
 										int randomVoice = random
 												.nextInt(Main.resourceLoader.voices.length);
 										Main.resourceLoader
@@ -386,7 +386,7 @@ public class Map implements Serializable {
 								System.out.println("selecting person");
 								selectedPerson = (Person) entities.get(i);
 								selectedPerson.setSelected(true);
-								if (selectedPerson.getMySex().matches("Male")) {
+								if (selectedPerson.getMySex().matches("Man")) {
 									int randomVoice = random
 											.nextInt(Main.resourceLoader.voices.length);
 									Main.resourceLoader

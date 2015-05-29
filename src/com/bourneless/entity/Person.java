@@ -28,8 +28,8 @@ public class Person extends Entity implements Serializable {
 	private Item fire;
 	private Vector2 firePos;
 
-	private String title;
-	private String name;
+	private String title = "";
+	private String name = "";
 
 	private int health;
 	private double stamina;
@@ -47,6 +47,13 @@ public class Person extends Entity implements Serializable {
 	private int farming;
 	private int cooking;
 	private int fishing;
+
+	private int fishFished;
+	private int woodCut;
+	private int rocksMined;
+	private int treesFarmed;
+
+	private boolean hasTitle = false;
 
 	private int strength;
 
@@ -90,6 +97,7 @@ public class Person extends Entity implements Serializable {
 	private boolean atFire;
 	private boolean walking;
 	private boolean needStamina;
+	private boolean leveled;
 
 	private Animation walkAnimation;
 	private boolean gotNightDestination;
@@ -102,6 +110,11 @@ public class Person extends Entity implements Serializable {
 
 			hasTree = false;
 			isWatering = false;
+			treesFarmed++;
+			if (treesFarmed % 10 == 0) {
+				leveled = true;
+				levelUp();
+			}
 			destinationPos = firePos;
 			tree.water();
 			carrying = true;
@@ -115,6 +128,11 @@ public class Person extends Entity implements Serializable {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			rock.mine();
+			rocksMined++;
+			if (rocksMined % 10 == 0) {
+				leveled = true;
+				levelUp();
+			}
 			setHasRock(false);
 			setMining(false);
 			destinationPos = firePos;
@@ -132,6 +150,11 @@ public class Person extends Entity implements Serializable {
 			hasTree = false;
 			isCutting = false;
 			destinationPos = firePos;
+			woodCut++;
+			if (woodCut % 10 == 0) {
+				leveled = true;
+				levelUp();
+			}
 			tree.cut();
 			inventory.addWood(2);
 			carrying = true;
@@ -146,6 +169,11 @@ public class Person extends Entity implements Serializable {
 		public void actionPerformed(ActionEvent e) {
 			hasLake = false;
 			isFishing = false;
+			fishFished++;
+			if (fishFished % 10 == 0) {
+				leveled = true;
+				levelUp();
+			}
 			destinationPos = firePos;
 			inventory.addRawFish(1);
 			carrying = true;
@@ -168,10 +196,10 @@ public class Person extends Entity implements Serializable {
 
 		this.inventory = new Inventory();
 
-		if (sex.matches("Male")) {
+		if (sex.matches("Man")) {
 			head = random.nextInt(Main.resourceLoader.maleHeads.length);
 			body = random.nextInt(Main.resourceLoader.maleBodies.length);
-		} else if (sex.matches("Female")) {
+		} else if (sex.matches("Woman")) {
 			head = random.nextInt(Main.resourceLoader.femaleHeads.length);
 			body = random.nextInt(Main.resourceLoader.femaleBodies.length);
 		}
@@ -229,7 +257,6 @@ public class Person extends Entity implements Serializable {
 		this.rect.y = pos.y + renderY;
 
 		this.map = map;
-
 		dayWalk();
 
 		fireDistance = Math.sqrt((firePos.x - pos.x) * (firePos.x - pos.x)
@@ -271,13 +298,13 @@ public class Person extends Entity implements Serializable {
 		} else if (role == Role.woodcutter) {
 			cutTree();
 		} else if (role == Role.fisherman) {
-			if(hasLake) {
+			if (hasLake) {
 				fish();
 			}
 			if (!hasLake) {
 				getLakeDestination();
 			}
-			
+
 		}
 
 		if (length <= 10 && length >= -10) {
@@ -320,20 +347,20 @@ public class Person extends Entity implements Serializable {
 
 	public void paint(Graphics2D g) {
 		if (!swimming) {
-			if (sex.matches("Male")) {
+			if (sex.matches("Man")) {
 				g.drawImage(Main.resourceLoader.maleHeads[head], pos.x
 						+ renderX, pos.y + renderY, null);
-			} else if (sex.matches("Female")) {
+			} else if (sex.matches("Woman")) {
 				g.drawImage(Main.resourceLoader.femaleHeads[head], pos.x
 						+ renderX, pos.y + renderY, null);
 			}
 			if (!walking) {
-				if (sex.matches("Male")) {
+				if (sex.matches("Man")) {
 					g.drawImage(Main.resourceLoader.maleBodies[body], pos.x
 							+ renderX, pos.y + renderY
 							+ Main.resourceLoader.maleHeads[head].getHeight(),
 							null);
-				} else if (sex.matches("Female")) {
+				} else if (sex.matches("Woman")) {
 					g.drawImage(
 							Main.resourceLoader.femaleBodies[body],
 							pos.x + renderX,
@@ -343,14 +370,14 @@ public class Person extends Entity implements Serializable {
 											.getHeight(), null);
 				}
 			} else {
-				if (sex.matches("Male")) {
+				if (sex.matches("Man")) {
 					walkAnimation.paint(
 							g,
 							new Vector2(pos.x + renderX, pos.y
 									+ renderY
 									+ Main.resourceLoader.maleHeads[head]
 											.getHeight()));
-				} else if (sex.matches("Female")) {
+				} else if (sex.matches("Woman")) {
 					walkAnimation.paint(
 							g,
 							new Vector2(pos.x + renderX, pos.y
@@ -362,10 +389,10 @@ public class Person extends Entity implements Serializable {
 		} else {
 			g.drawImage(Main.resourceLoader.swimming, pos.x + renderX, pos.y
 					+ renderY + 5, null);
-			if (sex.matches("Male")) {
+			if (sex.matches("Man")) {
 				g.drawImage(Main.resourceLoader.maleHeads[head], pos.x
 						+ renderX, pos.y + renderY, null);
-			} else if (sex.matches("Female")) {
+			} else if (sex.matches("Woman")) {
 				g.drawImage(Main.resourceLoader.femaleHeads[head], pos.x
 						+ renderX, pos.y + renderY, null);
 			}
@@ -393,9 +420,9 @@ public class Person extends Entity implements Serializable {
 	public void getSex() {
 		int s = random.nextInt(2);
 		if (s == 0) {
-			sex = "Female";
+			sex = "Woman";
 		} else {
-			sex = "Male";
+			sex = "Man";
 		}
 	}
 
@@ -505,7 +532,7 @@ public class Person extends Entity implements Serializable {
 
 	public String setName() {
 		String s;
-		if (sex.matches("Male")) {
+		if (sex.matches("Man")) {
 			int num = random.nextInt(Main.resourceLoader.maleNames.size());
 			s = Main.resourceLoader.maleNames.get(num);
 		} else {
@@ -571,19 +598,20 @@ public class Person extends Entity implements Serializable {
 			atDestination = false;
 			int getY = random.nextInt(Main.resourceLoader.lake.getHeight());
 			int getX = 0;
-			double rightLength = Math
-			.sqrt((lake.getPos().x + Main.resourceLoader.lake.getWidth() + 10 - pos.x)
-					* (lake.getPos().x + Main.resourceLoader.lake.getWidth() + 10 - pos.x)
+			double rightLength = Math.sqrt((lake.getPos().x
+					+ Main.resourceLoader.lake.getWidth() + 10 - pos.x)
+					* (lake.getPos().x + Main.resourceLoader.lake.getWidth()
+							+ 10 - pos.x)
 					+ (lake.getPos().y + getY - pos.y)
 					* (lake.getPos().y + getY - pos.y));
 			double leftLength = ((lake.getPos().x - 10 - pos.x)
-					* (lake.getPos().x - 10 - pos.x)
-					+ (lake.getPos().y + getY - pos.y)
+					* (lake.getPos().x - 10 - pos.x) + (lake.getPos().y + getY - pos.y)
 					* (lake.getPos().y + getY - pos.y));
 			double upLength;
 			double downLength;
-			if(rightLength < leftLength) {
-				getX = lake.getPos().x + Main.resourceLoader.lake.getWidth() + 20;
+			if (rightLength < leftLength) {
+				getX = lake.getPos().x + Main.resourceLoader.lake.getWidth()
+						+ 20;
 			} else {
 				getX = lake.getPos().x - 20;
 			}
@@ -681,12 +709,16 @@ public class Person extends Entity implements Serializable {
 
 	private Object readResolve() throws ObjectStreamException {
 		Person person = this;
+		person.fishingTimer.stop();
 		person.waterTimer.stop();
 		person.miningTimer.stop();
 		person.cutTimer.stop();
+		person.fishingTimer.restart();
 		person.cutTimer.restart();
 		person.waterTimer.restart();
 		person.miningTimer.restart();
+		person.isFishing = false;
+		person.hasLake = false;
 		person.isMining = false;
 		person.isWatering = false;
 		person.hasTree = false;
@@ -742,6 +774,19 @@ public class Person extends Entity implements Serializable {
 				carrying = true;
 				stamina -= 10;
 				rock = null;
+				((Timer) e.getSource()).stop();
+			}
+		});
+
+		person.fishingTimer = new Timer(3000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				hasLake = false;
+				isFishing = false;
+				destinationPos = firePos;
+				inventory.addRawFish(1);
+				carrying = true;
+				stamina -= 10;
 				((Timer) e.getSource()).stop();
 			}
 		});
@@ -920,5 +965,38 @@ public class Person extends Entity implements Serializable {
 
 	public String getMySex() {
 		return this.sex;
+	}
+
+	private void levelUp() {
+		if (leveled) {
+			if (fishFished > 0 && fishFished % 10 == 0) {
+				fishing++;
+				leveled = false;
+			} else if (rocksMined > 0 && rocksMined % 10 == 0) {
+				mining++;
+				leveled = false;
+			} else if (woodCut > 0 && woodCut % 10 == 0) {
+				woodcutting++;
+				leveled = false;
+			} else if (treesFarmed > 0 && treesFarmed % 10 == 0) {
+				farming++;
+				leveled = false;
+			}
+		}
+		if (!hasTitle) {
+			if (fishFished >= 10) {
+				this.title = "the Fisher" + sex.toLowerCase();
+				hasTitle = true;
+			} else if (rocksMined >= 10) {
+				this.title = "the Miner";
+				hasTitle = true;
+			} else if (woodCut >= 10) {
+				this.title = "the Woodcutter";
+				hasTitle = true;
+			} else if (treesFarmed >= 10) {
+				this.title = "the Farmer";
+				hasTitle = true;
+			}
+		}
 	}
 }
