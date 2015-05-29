@@ -104,6 +104,8 @@ public class MenuScreen extends Screen {
 				Main.game.setScreen(new MapScreen());
 			} else if(mouseRect.intersects(buttons[1].getRect())) {
 				loadGame();
+			} else if (mouseRect.intersects(buttons[2].getRect())) {
+				Main.game.setScreen(new CreditsScreen());
 			}
 		} else {
 			menuTitlePos.y = endMenuTitlePos.y;

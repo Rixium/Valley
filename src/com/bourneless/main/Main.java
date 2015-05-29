@@ -40,5 +40,6 @@ public class Main {
 		frame.setLocationRelativeTo(null); // Make window appear in centre of screen.
 		frame.setVisible(true); // Set the window to visible.
 		frame.createBufferStrategy(3);
+		frame.setIconImage(Main.resourceLoader.icon);
 	}
 }

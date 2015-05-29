@@ -4,35 +4,48 @@ import java.io.Serializable;
 
 public class Inventory implements Serializable {
 
-	private int rockcount = 0;
-	private int woodcount = 0;
+	private int rockCount = 0;
+	private int woodCount = 0;
+	private int rawFishCount = 0;
 
 	public Inventory() {
 
 	}
 
 	public int getRockCount() {
-		return this.rockcount;
+		return this.rockCount;
 	}
 
 	public int getWoodCount() {
-		return this.woodcount;
+		return this.woodCount;
+	}
+	
+	public int getRawFishCount() {
+		return this.rawFishCount;
 	}
 
 	public void addRock(int i) {
-		rockcount += i;
+		rockCount += i;
 	}
 
 	public void addWood(int i) {
-		woodcount += i;
+		woodCount += i;
+	}
+	
+	public void addRawFish(int i) {
+		rawFishCount += i;
 	}
 	
 	public void removeRock() {
-		this.rockcount = 0;
+		this.rockCount = 0;
 	}
 	
 	public void removeWood() {
-		this.woodcount = 0;
+		this.woodCount = 0;
+	}
+	
+	public void removeRawFish() {
+		this.rawFishCount = 0;
 	}
 
 }

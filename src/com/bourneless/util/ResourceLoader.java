@@ -16,6 +16,8 @@ import javax.sound.sampled.FloatControl;
 
 public class ResourceLoader {
 
+	public BufferedImage icon;
+	
 	// Splash Assets
 	public BufferedImage splashImage;
 
@@ -46,6 +48,8 @@ public class ResourceLoader {
 
 	public Clip menuMusic;
 	public Clip menuClick;
+	
+	public BufferedImage creditRoll;
 
 	// Tile Assets
 
@@ -119,6 +123,7 @@ public class ResourceLoader {
 	public BufferedImage wateringcan;
 	public BufferedImage pickaxe;
 	public BufferedImage hatchet;
+	public BufferedImage rod;
 
 	// Mechanics
 	public BufferedImage lightsource;
@@ -133,6 +138,7 @@ public class ResourceLoader {
 	public ArrayList<String> femaleNames = new ArrayList<String>();
 
 	public ResourceLoader() {
+		icon = getBufferedImage("res/valleyIcon.png");
 		splashImage = getBufferedImage("res/splash.png");
 
 		menuTitle = getBufferedImage("res/menuTitle.png");
@@ -144,6 +150,7 @@ public class ResourceLoader {
 		saveImage = getBufferedImage("res/saveImage.png");
 		quit = getBufferedImage("res/quit.png");
 		options = getBufferedImage("res/options.png");
+		creditRoll = getBufferedImage("res/creditroll.png");
 
 		grass = getBufferedImage("res/tiles/grassTile.png");
 		cow = getBufferedImage("res/gameobjects/cow.png");
@@ -237,6 +244,7 @@ public class ResourceLoader {
 		wateringcan = getBufferedImage("res/skillobjects/wateringcan.png");
 		pickaxe = getBufferedImage("res/skillobjects/pickaxe.png");
 		hatchet = getBufferedImage("res/skillobjects/hatchet.png");
+		rod = getBufferedImage("res/skillobjects/rod.png");
 
 		rock = getBufferedImage("res/gameobjects/rock.png");
 		rockMined = getBufferedImage("res/gameobjects/rockMined.png");

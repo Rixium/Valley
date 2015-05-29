@@ -12,8 +12,9 @@ import com.bourneless.mechanics.Cycle;
 
 public class Stockpile extends Entity implements Serializable {
 
-	private int woodcount;
-	private int rockcount;
+	private int woodCount;
+	private int rockCount;
+	private int rawFishCount;
 
 	public Stockpile(Vector2 pos) {
 		this.entityName = "Stockpile";
@@ -22,8 +23,8 @@ public class Stockpile extends Entity implements Serializable {
 		this.image = Main.resourceLoader.stockpile;
 		this.rect = new Rectangle(this.pos.x, this.pos.y, image.getWidth(),
 				image.getHeight());
-		woodcount = 0;
-		rockcount = 0;
+		woodCount = 0;
+		rockCount = 0;
 	}
 
 	public void update(int renderX, int renderY, Map map, Cycle cycle) {
@@ -39,19 +40,27 @@ public class Stockpile extends Entity implements Serializable {
 	}
 
 	public void addWood(int i) {
-		this.woodcount += i;
+		this.woodCount += i;
 	}
 
 	public void addRock(int i) {
-		this.rockcount += i;
+		this.rockCount += i;
+	}
+	
+	public void addRawFish(int i) {
+		this.rawFishCount += i;
 	}
 
 	public int getWood() {
-		return this.woodcount;
+		return this.woodCount;
 	}
 
 	public int getRock() {
-		return this.rockcount;
+		return this.rockCount;
+	}
+	
+	public int getRawFishCount() {
+		return this.getRawFishCount();
 	}
 
 }

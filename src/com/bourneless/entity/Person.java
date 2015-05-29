@@ -72,6 +72,7 @@ public class Person extends Entity implements Serializable {
 
 	private boolean hasTree;
 	private boolean hasRock;
+	private boolean hasLake;
 
 	private Tile destinationTile;
 	private Tile currentTile;
@@ -79,6 +80,7 @@ public class Person extends Entity implements Serializable {
 	private boolean isWatering = false;
 	private boolean isMining = false;
 	private boolean isCutting = false;
+	private boolean isFishing = false;
 
 	private Inventory inventory;
 
@@ -91,6 +93,8 @@ public class Person extends Entity implements Serializable {
 
 	private Animation walkAnimation;
 	private boolean gotNightDestination;
+
+	private Lake lake;
 
 	private Timer waterTimer = new Timer(3000, new ActionListener() {
 		@Override
@@ -137,12 +141,26 @@ public class Person extends Entity implements Serializable {
 		}
 	});
 
+	private Timer fishingTimer = new Timer(3000, new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			hasLake = false;
+			isFishing = false;
+			destinationPos = firePos;
+			inventory.addRawFish(1);
+			carrying = true;
+			stamina -= 10;
+			((Timer) e.getSource()).stop();
+		}
+	});
+
 	public Person(Item fire, Map map, God god, boolean carryingStockpile,
-			Cycle cycle) {
+			Cycle cycle, Lake lake) {
 		this.entityName = "Person";
 		godName = god.getName();
 		getSex();
 		this.name = setName();
+		this.lake = lake;
 
 		walkAnimation = new Animation(Main.resourceLoader.walkingImages, 100);
 		this.carryingStockpile = carryingStockpile;
@@ -252,6 +270,14 @@ public class Person extends Entity implements Serializable {
 			mineRock();
 		} else if (role == Role.woodcutter) {
 			cutTree();
+		} else if (role == Role.fisherman) {
+			if(hasLake) {
+				fish();
+			}
+			if (!hasLake) {
+				getLakeDestination();
+			}
+			
 		}
 
 		if (length <= 10 && length >= -10) {
@@ -357,6 +383,10 @@ public class Person extends Entity implements Serializable {
 			g.drawImage(Main.resourceLoader.hatchet,
 					pos.x + renderX + image.getWidth() - 6, pos.y + renderY
 							+ image.getHeight() / 2 + 5, null);
+		} else if (isFishing) {
+			g.drawImage(Main.resourceLoader.rod,
+					pos.x + renderX + image.getWidth() - 10, pos.y + renderY
+							- image.getHeight() / 4 + 5, null);
 		}
 	}
 
@@ -534,6 +564,33 @@ public class Person extends Entity implements Serializable {
 
 	}
 
+	public void getLakeDestination() {
+		if (!needStamina && !carrying && !hasLake && cycle.getDay()) {
+			hasLake = true;
+			hasDestination = true;
+			atDestination = false;
+			int getY = random.nextInt(Main.resourceLoader.lake.getHeight());
+			int getX = 0;
+			double rightLength = Math
+			.sqrt((lake.getPos().x + Main.resourceLoader.lake.getWidth() + 10 - pos.x)
+					* (lake.getPos().x + Main.resourceLoader.lake.getWidth() + 10 - pos.x)
+					+ (lake.getPos().y + getY - pos.y)
+					* (lake.getPos().y + getY - pos.y));
+			double leftLength = ((lake.getPos().x - 10 - pos.x)
+					* (lake.getPos().x - 10 - pos.x)
+					+ (lake.getPos().y + getY - pos.y)
+					* (lake.getPos().y + getY - pos.y));
+			double upLength;
+			double downLength;
+			if(rightLength < leftLength) {
+				getX = lake.getPos().x + Main.resourceLoader.lake.getWidth() + 20;
+			} else {
+				getX = lake.getPos().x - 20;
+			}
+			this.destinationPos = new Vector2(getX, lake.getPos().y + getY);
+		}
+	}
+
 	public boolean hasTree() {
 		return hasTree;
 	}
@@ -602,6 +659,12 @@ public class Person extends Entity implements Serializable {
 						+ " Rock to the Stockpile.");
 				stockpile.addRock(inventory.getRockCount());
 				inventory.removeRock();
+			}
+			if (inventory.getRawFishCount() > 0) {
+				System.out.println("Adding " + inventory.getRawFishCount()
+						+ " Raw Fish to the Stockpile.");
+				stockpile.addRawFish(inventory.getRawFishCount());
+				inventory.removeRawFish();
 			}
 			carrying = false;
 			hasDestination = false;
@@ -733,7 +796,7 @@ public class Person extends Entity implements Serializable {
 			gotNightDestination = false;
 			if (!hasDestination && stamina > 5 && !carryingStockpile
 					&& !carrying) {
-				if (!hasTree && !hasRock) {
+				if (!hasTree && !hasRock && !hasLake) {
 
 					int getDestination = random.nextInt(300);
 					if (getDestination == 1) {
@@ -830,6 +893,13 @@ public class Person extends Entity implements Serializable {
 		}
 	}
 
+	public void fish() {
+		if (length <= 10 && length >= -10) {
+			isFishing = true;
+			fishingTimer.start();
+		}
+	}
+
 	public void cutTree() {
 		if (hasTree) {
 			if (length <= 10 && length >= -10) {
@@ -843,7 +913,6 @@ public class Person extends Entity implements Serializable {
 		if (hasTree) {
 			if (length <= 10 && length >= -10) {
 				isWatering = true;
-
 				waterTimer.start();
 			}
 		}

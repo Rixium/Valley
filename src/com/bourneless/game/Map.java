@@ -284,10 +284,9 @@ public class Map implements Serializable {
 
 					if (spawnPerson == 1 && cycle.getDay()) {
 						System.out.println("Spawning Person..");
-
 						population++;
 						Person person = new Person(fire, this, god,
-								giveStockpile, cycle);
+								giveStockpile, cycle, lake);
 						giveStockpile = false;
 						entities.add(person);
 						people.add(person);
