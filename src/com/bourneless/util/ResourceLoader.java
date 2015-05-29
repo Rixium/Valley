@@ -118,6 +118,7 @@ public class ResourceLoader {
 	// Role objects
 	public BufferedImage wateringcan;
 	public BufferedImage pickaxe;
+	public BufferedImage hatchet;
 
 	// Mechanics
 	public BufferedImage lightsource;
@@ -235,6 +236,7 @@ public class ResourceLoader {
 
 		wateringcan = getBufferedImage("res/skillobjects/wateringcan.png");
 		pickaxe = getBufferedImage("res/skillobjects/pickaxe.png");
+		hatchet = getBufferedImage("res/skillobjects/hatchet.png");
 
 		rock = getBufferedImage("res/gameobjects/rock.png");
 		rockMined = getBufferedImage("res/gameobjects/rockMined.png");

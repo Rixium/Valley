@@ -353,6 +353,10 @@ public class Person extends Entity implements Serializable {
 			g.drawImage(Main.resourceLoader.pickaxe,
 					pos.x + renderX + image.getWidth() - 6, pos.y + renderY
 							+ image.getHeight() / 2 + 5, null);
+		} else if (isCutting) {
+			g.drawImage(Main.resourceLoader.hatchet,
+					pos.x + renderX + image.getWidth() - 6, pos.y + renderY
+							+ image.getHeight() / 2 + 5, null);
 		}
 	}
 
