@@ -18,6 +18,7 @@ import com.bourneless.game.Item;
 import com.bourneless.game.Map;
 import com.bourneless.game.Role;
 import com.bourneless.game.Tile;
+import com.bourneless.item.Fire;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
 import com.bourneless.mechanics.Cycle;
@@ -52,6 +53,7 @@ public class Person extends Entity implements Serializable {
 	private int woodCut;
 	private int rocksMined;
 	private int treesFarmed;
+	private int meatCooked;
 
 	private boolean hasTitle = false;
 
@@ -63,6 +65,7 @@ public class Person extends Entity implements Serializable {
 	private boolean hasDestination;
 	private boolean atDestination;
 	private boolean swimming;
+	private boolean hasWithdrew = false;
 
 	private String myThought = "Nothing.";
 	private String godName;
@@ -80,6 +83,7 @@ public class Person extends Entity implements Serializable {
 	private boolean hasTree;
 	private boolean hasRock;
 	private boolean hasLake;
+	private boolean hasStockpile;
 
 	private Tile destinationTile;
 	private Tile currentTile;
@@ -87,7 +91,11 @@ public class Person extends Entity implements Serializable {
 	private boolean isWatering = false;
 	private boolean isMining = false;
 	private boolean isCutting = false;
+	private boolean isCooking = false;
 	private boolean isFishing = false;
+
+	private boolean cookingRawFish = false;
+	private boolean cookingRawMeat = false;
 
 	private Inventory inventory;
 
@@ -140,6 +148,31 @@ public class Person extends Entity implements Serializable {
 			carrying = true;
 			stamina -= 10;
 			rock = null;
+			((Timer) e.getSource()).stop();
+		}
+	});
+
+	private Timer cookingTimer = new Timer(10000, new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			meatCooked++;
+			if (meatCooked % 10 == 0) {
+				leveled = true;
+				levelUp();
+			}
+			destinationPos = firePos;
+			if (cookingRawFish) {
+				inventory.addCookedFish(1);
+			} else if (cookingRawMeat) {
+				inventory.addCookedMeat(1);
+			}
+			hasStockpile = false;
+			isCooking = false;
+			Fire fire = (Fire) map.getFire();
+			fire.setCooking(false);
+			hasWithdrew = false;
+			carrying = true;
+			stamina -= 10;
 			((Timer) e.getSource()).stop();
 		}
 	});
@@ -304,7 +337,15 @@ public class Person extends Entity implements Serializable {
 			if (!hasLake) {
 				getLakeDestination();
 			}
-
+		} else if (role == Role.cook) {
+			if (map.getHasStockpile() && !hasStockpile && !carrying) {
+				if (map.getStockpile().getRawFish() > 0
+						|| map.getStockpile().getRawMeat() > 0) {
+					getStockpileDestination();
+				}
+			} else if (hasStockpile && !carrying) {
+				withDrawStockpile();
+			}
 		}
 
 		if (length <= 10 && length >= -10) {
@@ -591,6 +632,16 @@ public class Person extends Entity implements Serializable {
 
 	}
 
+	public void getStockpileDestination() {
+		if (!needStamina && !carrying && !hasStockpile && cycle.getDay()) {
+			hasStockpile = true;
+			this.destinationPos = new Vector2(map.getStockpile().getPos().x,
+					map.getStockpile().getPos().y);
+			hasDestination = true;
+			atDestination = false;
+		}
+	}
+
 	public void getLakeDestination() {
 		if (!needStamina && !carrying && !hasLake && cycle.getDay()) {
 			hasLake = true;
@@ -598,22 +649,24 @@ public class Person extends Entity implements Serializable {
 			atDestination = false;
 			int getY = random.nextInt(Main.resourceLoader.lake.getHeight());
 			int getX = 0;
-			double rightLength = Math.sqrt((lake.getPos().x
-					+ Main.resourceLoader.lake.getWidth() + 10 - pos.x)
-					* (lake.getPos().x + Main.resourceLoader.lake.getWidth()
-							+ 10 - pos.x)
-					+ (lake.getPos().y + getY - pos.y)
-					* (lake.getPos().y + getY - pos.y));
-			double leftLength = ((lake.getPos().x - 10 - pos.x)
-					* (lake.getPos().x - 10 - pos.x) + (lake.getPos().y + getY - pos.y)
-					* (lake.getPos().y + getY - pos.y));
-			double upLength;
-			double downLength;
-			if (rightLength < leftLength) {
+			double rightLength = Math
+					.sqrt((lake.getPos().x
+							+ Main.resourceLoader.lake.getWidth() - pos.x)
+							* (lake.getPos().x
+									+ Main.resourceLoader.lake.getWidth() - pos.x)
+							+ (lake.getPos().y - pos.y)
+							* (lake.getPos().y - pos.y));
+
+			double leftLength = Math.sqrt((lake.getPos().x - pos.x)
+					* (lake.getPos().x - pos.x) + (lake.getPos().y - pos.y)
+					* (lake.getPos().y - pos.y));
+
+			if (leftLength < rightLength) {
+				getX = lake.getPos().x - 20;
+
+			} else {
 				getX = lake.getPos().x + Main.resourceLoader.lake.getWidth()
 						+ 20;
-			} else {
-				getX = lake.getPos().x - 20;
 			}
 			this.destinationPos = new Vector2(getX, lake.getPos().y + getY);
 		}
@@ -692,8 +745,27 @@ public class Person extends Entity implements Serializable {
 				System.out.println("Adding " + inventory.getRawFishCount()
 						+ " Raw Fish to the Stockpile.");
 				stockpile.addRawFish(inventory.getRawFishCount());
-				inventory.removeRawFish();
+				inventory.removeRawFish(inventory.getRawFishCount());
 			}
+			if (inventory.getRawMeatCount() > 0) {
+				System.out.println("Adding " + inventory.getRawMeatCount()
+						+ " Raw Meat to the Stockpile.");
+				stockpile.addRawMeat(inventory.getRawMeatCount());
+				inventory.removeRawMeat(inventory.getRawMeatCount());
+			}
+			if (inventory.getCookedFishCount() > 0) {
+				System.out.println("Adding " + inventory.getCookedFishCount()
+						+ " Cooked Fish to the Stockpile.");
+				stockpile.addCookedFish(inventory.getCookedFishCount());
+				inventory.removeCookedFish(inventory.getCookedFishCount());
+			}
+			if (inventory.getCookedMeatCount() > 0) {
+				System.out.println("Adding " + inventory.getCookedMeatCount()
+						+ " Cooked Meat to the Stockpile.");
+				stockpile.addCookedMeat(inventory.getCookedMeatCount());
+				inventory.removeCookedMeat(inventory.getCookedMeatCount());
+			}
+
 			carrying = false;
 			hasDestination = false;
 		}
@@ -904,8 +976,10 @@ public class Person extends Entity implements Serializable {
 			this.miningTimer.stop();
 			this.isMining = false;
 			this.isWatering = false;
+			this.isFishing = false;
 			hasTree = false;
 			hasRock = false;
+			hasLake = false;
 			rock = null;
 			tree = null;
 			atDestination = false;
@@ -935,6 +1009,42 @@ public class Person extends Entity implements Serializable {
 				isMining = true;
 				miningTimer.start();
 			}
+		}
+	}
+
+	public void withDrawStockpile() {
+		if (length <= 10 && length >= -10) {
+			if (this.role == Role.cook) {
+				if (map.getStockpile().getRawFish() > 0 && !hasWithdrew) {
+					map.getStockpile().removeRawFish(1);
+					this.inventory.addRawFish(1);
+					hasWithdrew = true;
+					goCook();
+				} else if (map.getStockpile().getRawMeat() > 0 && !hasWithdrew) {
+					map.getStockpile().removeRawMeat(1);
+					this.inventory.addRawMeat(1);
+					hasWithdrew = true;
+					goCook();
+				}
+
+			}
+		}
+	}
+
+	public void goCook() {
+		this.destinationPos = new Vector2(firePos.x, firePos.y);
+		if (length <= 10 && length >= -10 && !isCooking) {
+			if (this.inventory.getRawFishCount() > 0) {
+				this.inventory.removeRawFish(1);
+				cookingRawFish = true;
+			} else if (this.inventory.getRawMeatCount() > 0) {
+				this.inventory.removeRawMeat(1);
+				cookingRawMeat = true;
+			}
+			Fire fire = (Fire) map.getFire();
+			fire.setCooking(true);
+			isCooking = true;
+			cookingTimer.start();
 		}
 	}
 

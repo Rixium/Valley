@@ -79,7 +79,9 @@ public class ResourceLoader {
 
 	// Game Items
 
+	public BufferedImage skewer;
 	public BufferedImage fireImage;
+	
 	public BufferedImage lake;
 	public BufferedImage stockpile;
 
@@ -175,6 +177,7 @@ public class ResourceLoader {
 		toggleSoundOff = getBufferedImage("res/toggleSoundOffImage.png");
 
 		fireImage = getBufferedImage("res/gameobjects/fire.png");
+		skewer = getBufferedImage("res/gameobjects/fireCook.png");
 		fireButtonImage = getBufferedImage("res/buttons/fireButton.png");
 
 		small = getBufferedImage("res/buttons/small.png");

@@ -14,7 +14,10 @@ public class Stockpile extends Entity implements Serializable {
 
 	private int woodCount;
 	private int rockCount;
-	private int rawFishCount;
+	private int rawFishCount = 5;
+	private int rawMeatCount;
+	private int cookedMeat = 0;
+	private int cookedFish = 0;
 
 	public Stockpile(Vector2 pos) {
 		this.entityName = "Stockpile";
@@ -46,9 +49,29 @@ public class Stockpile extends Entity implements Serializable {
 	public void addRock(int i) {
 		this.rockCount += i;
 	}
-	
+
 	public void addRawFish(int i) {
 		this.rawFishCount += i;
+	}
+
+	public void addRawMeat(int i) {
+		this.rawMeatCount += i;
+	}
+
+	public void removeWood(int i) {
+		this.woodCount -= i;
+	}
+
+	public void removeRock(int i) {
+		this.rockCount -= i;
+	}
+
+	public void removeRawFish(int i) {
+		this.rawFishCount -= i;
+	}
+
+	public void removeRawMeat(int i) {
+		this.rawMeatCount -= i;
 	}
 
 	public int getWood() {
@@ -58,9 +81,29 @@ public class Stockpile extends Entity implements Serializable {
 	public int getRock() {
 		return this.rockCount;
 	}
+
+	public int getRawFish() {
+		return this.rawFishCount;
+	}
+
+	public int getRawMeat() {
+		return this.rawMeatCount;
+	}
 	
-	public int getRawFishCount() {
-		return this.getRawFishCount();
+	public int getCookedMeatCount() {
+		return this.cookedMeat;
+	}
+
+	public int getCookedFishCount() {
+		return this.cookedFish;
+	}
+	
+	public void addCookedMeat(int i) {
+		this.cookedMeat += i;
+	}
+
+	public void addCookedFish(int i) {
+		this.cookedFish += i;
 	}
 
 }

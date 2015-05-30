@@ -38,7 +38,7 @@ public class Game extends JPanel implements Runnable {
 		this.width = width;
 		this.height = height;
 		this.frame = frame;
-		
+
 		initialize();
 	}
 
@@ -113,7 +113,6 @@ public class Game extends JPanel implements Runnable {
 				updates = 0;
 				frames = 0;
 			}
-
 
 		}
 

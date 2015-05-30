@@ -9,6 +9,7 @@ import com.bourneless.game.Entity;
 import com.bourneless.game.Map;
 import com.bourneless.main.Main;
 import com.bourneless.math.Vector2;
+import com.bourneless.mechanics.Cycle;
 
 public class Cow extends Entity implements Serializable {
 
@@ -27,8 +28,7 @@ public class Cow extends Entity implements Serializable {
 		this.layer = pos.y / map.getSize();
 	}
 
-	public void update(int renderX, int renderY, Map map) {
-
+	public void update(int renderX, int renderY, Map map, Cycle cycle) {
 		this.renderX = renderX;
 		this.renderY = renderY;
 		this.map = map;

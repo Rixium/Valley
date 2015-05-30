@@ -24,7 +24,6 @@ public class Main {
 	private static InputListener inputListener;
 
 	public static void main(String[] args) {
-
 		inputListener = new InputListener();
 		game.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 		frame.add(game);

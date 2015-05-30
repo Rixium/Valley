@@ -361,8 +361,8 @@ public class Map implements Serializable {
 									selectedPerson.setSelected(false);
 									selectedPerson = currentPerson;
 									selectedPerson.setSelected(true);
-									if (selectedPerson.getMySex().matches(
-											"Man")) {
+									if (selectedPerson.getMySex()
+											.matches("Man")) {
 										int randomVoice = random
 												.nextInt(Main.resourceLoader.voices.length);
 										Main.resourceLoader
@@ -424,6 +424,12 @@ public class Map implements Serializable {
 			if (mousePos.intersects(stockpile.getRect())) {
 				System.out.println("WoodCount: " + stockpile.getWood());
 				System.out.println("RockCount: " + stockpile.getRock());
+				System.out.println("RawFishCount: " + stockpile.getRawFish());
+				System.out.println("RawMeatCount: " + stockpile.getRawMeat());
+				System.out.println("CookedFishCount: "
+						+ stockpile.getCookedFishCount());
+				System.out.println("CookedMeaetCount: "
+						+ stockpile.getCookedMeatCount());
 			}
 		}
 	}
@@ -516,5 +522,9 @@ public class Map implements Serializable {
 
 	public int getXOffset() {
 		return this.renderX;
+	}
+
+	public Item getFire() {
+		return this.fire;
 	}
 }

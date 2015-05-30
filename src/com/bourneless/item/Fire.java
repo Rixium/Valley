@@ -21,6 +21,7 @@ public class Fire extends Item implements Serializable {
 
 	private transient Animation fireAnimation;
 	private boolean isAnimating = false;
+	private boolean isCooking = false;
 
 	public Fire() {
 		fireAnimation = new Animation(Main.resourceLoader.flameImages, 100);
@@ -30,7 +31,6 @@ public class Fire extends Item implements Serializable {
 		this.price = 0;
 		this.buttonImage = Main.resourceLoader.fireButtonImage;
 		this.image = Main.resourceLoader.fireImage;
-
 	}
 
 	public Fire(Vector2 pos, Map map) {
@@ -52,12 +52,17 @@ public class Fire extends Item implements Serializable {
 
 	public void paint(Graphics2D g) {
 		super.paint(g);
+		if (isCooking) {
+			g.drawImage(Main.resourceLoader.skewer, pos.x + renderX, pos.y + renderY, null);
+		}
 		if (Main.game.getScreen().getInstance().getCycle() != null) {
-			if (!Main.game.getScreen().getInstance().getCycle().getDay()) {
+			if (!Main.game.getScreen().getInstance().getCycle().getDay()
+					|| isCooking) {
 				if (!isAnimating) {
 					fireAnimation.start();
 					isAnimating = true;
 				}
+
 				fireAnimation.paint(g, new Vector2(pos.x + renderX, pos.y
 						+ renderY));
 
@@ -72,5 +77,13 @@ public class Fire extends Item implements Serializable {
 		Fire fire = this;
 		fire.fireAnimation = new Animation(Main.resourceLoader.flameImages, 100);
 		return fire;
+	}
+
+	public boolean getCooking() {
+		return this.isCooking;
+	}
+
+	public void setCooking(boolean bool) {
+		this.isCooking = bool;
 	}
 }
